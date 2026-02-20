@@ -35,7 +35,7 @@ export async function addSubscriber(
   businessName?: string,
   source: string = 'website'
 ) {
-  const { data, error } = await requireAdmin()
+  const { error } = await requireAdmin()
     .from('hf_subscribers')
     .upsert(
       {
@@ -47,12 +47,10 @@ export async function addSubscriber(
         subscribed_at: new Date().toISOString(),
       },
       { onConflict: 'email' }
-    )
-    .select()
-    .single();
+    );
 
   if (error) throw error;
-  return data;
+  return { email };
 }
 
 export async function getSubscriberCount(): Promise<number> {

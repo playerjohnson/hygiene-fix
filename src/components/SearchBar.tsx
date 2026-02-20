@@ -18,8 +18,33 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
   const [error, setError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout>(undefined);
+
+  // Recalculate fixed dropdown position on open or resize
+  useEffect(() => {
+    function calcPos() {
+      if (!wrapperRef.current) return;
+      const rect = wrapperRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+        backgroundColor: '#0B1B2B',
+        boxShadow: '0 24px 48px rgba(0,0,0,0.9)',
+      });
+    }
+    calcPos();
+    window.addEventListener('resize', calcPos);
+    window.addEventListener('scroll', calcPos, { passive: true });
+    return () => {
+      window.removeEventListener('resize', calcPos);
+      window.removeEventListener('scroll', calcPos);
+    };
+  }, [showResults]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -63,6 +88,14 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
     debounceRef.current = setTimeout(() => doSearch(val), 400);
   };
 
+  const handleTypeChange = (type: 'postcode' | 'name') => {
+    setSearchType(type);
+    if (query.length >= 2) {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => doSearch(query), 150);
+    }
+  };
+
   const handleSelect = (est: FSAEstablishment) => {
     setShowResults(false);
     if (onSelect) {
@@ -73,99 +106,116 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
   };
 
   const isHero = size === 'hero';
+  const dropdownOpen = showResults && (results.length > 0 || error || (!loading && query.length >= 2));
 
   return (
-    <div ref={wrapperRef} className="relative w-full z-50">
-      {/* Search type toggle */}
-      <div className="flex gap-1 mb-2">
-        <button
-          onClick={() => setSearchType('postcode')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-            searchType === 'postcode'
-              ? 'bg-brand-blue/20 text-brand-sky border border-brand-blue/30'
-              : 'text-white/40 hover:text-white/60'
-          }`}
-        >
-          <MapPin className="w-3 h-3" /> Postcode
-        </button>
-        <button
-          onClick={() => setSearchType('name')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-            searchType === 'name'
-              ? 'bg-brand-blue/20 text-brand-sky border border-brand-blue/30'
-              : 'text-white/40 hover:text-white/60'
-          }`}
-        >
-          <Store className="w-3 h-3" /> Business Name
-        </button>
-      </div>
-
-      {/* Input */}
-      <div className="relative">
-        <Search className={`absolute left-4 top-1/2 -translate-y-1/2 text-white/30 ${isHero ? 'w-5 h-5' : 'w-4 h-4'}`} />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => handleInput(e.target.value)}
-          onFocus={() => results.length > 0 && setShowResults(true)}
-          placeholder={searchType === 'postcode' ? 'Enter postcode (e.g. SW1A 1AA)' : 'Enter business name'}
-          className={`w-full bg-white/5 border border-white/10 text-white placeholder:text-white/25 rounded-2xl transition-all focus:border-brand-sky/40 focus:bg-white/[0.07] ${
-            isHero ? 'pl-12 pr-12 py-4 text-lg' : 'pl-10 pr-10 py-3 text-sm'
-          }`}
-        />
-        {loading && (
-          <Loader2 className={`absolute right-4 top-1/2 -translate-y-1/2 text-brand-sky animate-spin ${isHero ? 'w-5 h-5' : 'w-4 h-4'}`} />
-        )}
-        {!loading && query && (
+    <div ref={wrapperRef} className="relative w-full">
+      {/* Search widget */}
+      <div
+        className={`bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all focus-within:border-brand-sky/40 focus-within:bg-white/[0.07] ${
+          dropdownOpen ? 'rounded-b-none border-b-transparent' : ''
+        }`}
+      >
+        {/* Type toggle */}
+        <div className="flex border-b border-white/5 px-1 pt-1 gap-0.5">
           <button
-            onClick={() => { setQuery(''); setResults([]); setShowResults(false); setError(null); }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+            type="button"
+            onClick={() => handleTypeChange('postcode')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              searchType === 'postcode'
+                ? 'bg-brand-blue/20 text-brand-sky'
+                : 'text-white/35 hover:text-white/60'
+            }`}
           >
-            <X className={isHero ? 'w-5 h-5' : 'w-4 h-4'} />
+            <MapPin className="w-3 h-3" /> Postcode
           </button>
-        )}
-      </div>
+          <button
+            type="button"
+            onClick={() => handleTypeChange('name')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              searchType === 'name'
+                ? 'bg-brand-blue/20 text-brand-sky'
+                : 'text-white/35 hover:text-white/60'
+            }`}
+          >
+            <Store className="w-3 h-3" /> Business Name
+          </button>
+        </div>
 
-      {/* Results dropdown */}
-      {showResults && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-brand-dark border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[420px] overflow-y-auto">
-          <div className="px-4 py-2 border-b border-white/5">
-            <span className="text-xs text-white/40">{totalCount} result{totalCount !== 1 ? 's' : ''} found</span>
-          </div>
-          {results.map((est) => (
+        {/* Input */}
+        <div className="relative flex items-center">
+          <Search className={`absolute left-4 text-white/30 ${isHero ? 'w-5 h-5' : 'w-4 h-4'}`} />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => handleInput(e.target.value)}
+            onFocus={() => results.length > 0 && setShowResults(true)}
+            placeholder={searchType === 'postcode' ? 'Enter postcode (e.g. SW1A 1AA)' : 'Enter business name'}
+            className={`w-full bg-transparent border-none text-white placeholder:text-white/25 outline-none transition-all ${
+              isHero ? 'pl-12 pr-12 py-4 text-lg' : 'pl-10 pr-10 py-3 text-sm'
+            }`}
+          />
+          {loading && (
+            <Loader2 className={`absolute right-4 text-brand-sky animate-spin ${isHero ? 'w-5 h-5' : 'w-4 h-4'}`} />
+          )}
+          {!loading && query && (
             <button
-              key={est.FHRSID}
-              onClick={() => handleSelect(est)}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left border-b border-white/5 last:border-0"
+              type="button"
+              onClick={() => { setQuery(''); setResults([]); setShowResults(false); setError(null); }}
+              className="absolute right-4 text-white/30 hover:text-white/60 transition-colors"
+              aria-label="Clear search"
             >
-              <RatingBadge rating={est.RatingValue} size="sm" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{est.BusinessName}</p>
-                <p className="text-xs text-white/40 truncate">
-                  {[est.AddressLine1, est.AddressLine2, est.PostCode].filter(Boolean).join(', ')}
-                </p>
-                <p className="text-xs text-white/25">{est.BusinessType}</p>
-              </div>
+              <X className={isHero ? 'w-5 h-5' : 'w-4 h-4'} />
             </button>
-          ))}
+          )}
         </div>
-      )}
+      </div>
 
-      {showResults && error && !loading && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-brand-dark border border-amber-500/20 rounded-2xl shadow-2xl p-6 z-50 text-center">
-          <p className="text-sm text-amber-400/90 mb-2">⚠️ {error}</p>
-          <button
-            onClick={() => doSearch(query)}
-            className="text-xs text-brand-sky hover:text-white transition-colors underline"
-          >
-            Try again
-          </button>
-        </div>
-      )}
+      {/* Dropdown — position: fixed so it can't be painted over by any sibling */}
+      {dropdownOpen && (
+        <div
+          style={dropdownStyle}
+          className="rounded-b-2xl border border-white/10 border-t-0 overflow-hidden max-h-[400px] overflow-y-auto"
+        >
+          {results.length > 0 && (
+            <>
+              <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between">
+                <span className="text-xs text-white/35 font-mono">{totalCount} result{totalCount !== 1 ? 's' : ''} found</span>
+                <span className="text-[10px] text-white/20">Click to view score breakdown</span>
+              </div>
+              {results.map((est) => (
+                <button
+                  key={est.FHRSID}
+                  onClick={() => handleSelect(est)}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.06] transition-colors text-left border-b border-white/5 last:border-0"
+                >
+                  <RatingBadge rating={est.RatingValue} size="sm" showLabel />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{est.BusinessName}</p>
+                    <p className="text-xs text-white/40 truncate">
+                      {[est.AddressLine1, est.AddressLine2, est.PostCode].filter(Boolean).join(', ')}
+                    </p>
+                    <p className="text-[10px] text-white/20 mt-0.5">{est.BusinessType}</p>
+                  </div>
+                </button>
+              ))}
+            </>
+          )}
 
-      {showResults && !error && results.length === 0 && !loading && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-brand-dark border border-white/10 rounded-2xl shadow-2xl p-6 z-50 text-center">
-          <p className="text-sm text-white/50">No businesses found. Try a different {searchType === 'postcode' ? 'postcode' : 'name'}.</p>
+          {error && (
+            <div className="p-6 text-center">
+              <p className="text-sm text-amber-400/90 mb-2">⚠️ {error}</p>
+              <button onClick={() => doSearch(query)} className="text-xs text-brand-sky hover:text-white transition-colors underline">
+                Try again
+              </button>
+            </div>
+          )}
+
+          {!error && results.length === 0 && !loading && query.length >= 2 && (
+            <div className="p-6 text-center">
+              <p className="text-sm text-white/50">No businesses found. Try a different {searchType === 'postcode' ? 'postcode' : 'name'}.</p>
+            </div>
+          )}
         </div>
       )}
     </div>

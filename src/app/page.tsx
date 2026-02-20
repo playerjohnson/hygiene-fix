@@ -127,7 +127,7 @@ export default function HomePage() {
           </p>
 
           {/* Search — id anchor for header CTA */}
-          <div id="search" className="max-w-xl mx-auto animate-slide-up stagger-2">
+          <div id="search" className="max-w-xl mx-auto animate-slide-up stagger-2 relative z-[100]">
             <SearchBar size="hero" />
           </div>
 

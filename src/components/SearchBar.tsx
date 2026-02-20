@@ -148,7 +148,7 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
 
       {/* Results dropdown — shares border with the widget above */}
       {showResults && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 bg-[#0B1B2B] border border-white/10 border-t-0 rounded-b-2xl shadow-2xl overflow-hidden z-50 max-h-[400px] overflow-y-auto" style={{backgroundColor: '#0B1B2B'}}>
+        <div className="absolute top-full left-0 right-0 border border-white/10 border-t-0 rounded-b-2xl overflow-hidden z-[200] max-h-[400px] overflow-y-auto" style={{backgroundColor: '#0B1B2B', boxShadow: '0 24px 48px rgba(0,0,0,0.8)'}}>
           <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between">
             <span className="text-xs text-white/35 font-mono">{totalCount} result{totalCount !== 1 ? 's' : ''} found</span>
             <span className="text-[10px] text-white/20">Click to view score breakdown</span>

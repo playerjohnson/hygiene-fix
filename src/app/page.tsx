@@ -71,7 +71,7 @@ export default function HomePage() {
       <Header />
       <main className="relative z-10">
         {/* Hero */}
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 text-center">
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 text-center relative z-40">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-semibold mb-6 animate-fade-in">
             <AlertTriangle className="w-3.5 h-3.5" />
             14,000+ UK food businesses currently rated 0–2
@@ -98,7 +98,7 @@ export default function HomePage() {
         </section>
 
         {/* Stats bar */}
-        <section className="border-y border-white/5 bg-white/[0.01]">
+        <section className="border-y border-white/5 bg-white/[0.01] relative z-0">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
             {STATS.map((stat, i) => (
               <div key={i} className="flex items-center gap-4 justify-center sm:justify-start">

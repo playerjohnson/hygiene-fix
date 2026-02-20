@@ -108,10 +108,10 @@ export default function HomePage() {
         {/* ── Hero ── */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 text-center">
           {/* Live ticker badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-semibold mb-6 animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse-dot" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/20 text-xs font-semibold mb-6 animate-fade-in whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse-dot shrink-0" />
             <span className="text-white/60">
-              <span className="text-brand-red font-bold">14,000+</span> UK food businesses currently rated 0–2
+              <span className="text-brand-red font-bold">14,000+</span> businesses rated 0–2
             </span>
             <span className="text-white/20 font-mono text-[10px] tracking-wide hidden sm:inline">· Updated daily</span>
           </div>

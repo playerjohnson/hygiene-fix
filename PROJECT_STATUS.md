@@ -1,6 +1,6 @@
 # HygieneFix — Project Status
 
-## Last Updated: 2026-02-20 (Session 3)
+## Last Updated: 2026-02-20 (Session 4 — White-Collar Audit Phase 1)
 
 ## Sprint 1 Progress
 
@@ -13,8 +13,8 @@
 - **Check page** (`/check/[fhrsid]`) — Dynamic SSR page with score breakdown, priority action, CTA for action plan, local authority info
 - **Score breakdown component** — Animated bar chart with colour-coded severity
 - **Email capture component** — Subscribe endpoint with Supabase backend
-- **Privacy policy** — Comprehensive GDPR-compliant (~900 words)
-- **Terms of service** — Full consumer protection compliance (~700 words)
+- **Privacy policy** — Comprehensive GDPR-compliant (~1,000 words, updated with pipeline data processing disclosure)
+- **Terms of service** — Full consumer protection compliance (~900 words, updated with AI-generated content section)
 - **Sitemap & robots.txt** — Next.js native generation
 - **Design system** — DM Serif Display headings, Nunito Sans body, navy dark theme, rating colour system, grain overlay
 - **Deployed to Vercel** — https://hygiene-fix.vercel.app (production)
@@ -24,18 +24,18 @@
 
 ### 🔜 SPRINT 1 REMAINING (deferred until custom domain)
 - [ ] Google Search Console setup
-- [ ] GA4 + GTM integration with cookie consent
+- [ ] GA4 + GTM integration (cookie consent banner is now in place)
 - [ ] Verify pipeline works when FSA API recovers
 
 ## Sprint 2 Progress
 
 ### ✅ COMPLETED
-- **Claude API checklist generator** — Score-based personalised action plan with SFBB references, priority rankings, business-type tailoring
+- **Claude API checklist generator** — Score-based personalised action plan with SFBB references, priority rankings, business-type tailoring, allergen management (Natasha's Law), reinspection process details
 - **PDF generator** — Branded A4 PDF with jsPDF: cover, score breakdown, checklist sections with checkboxes, re-inspection advice, timeline
 - **Stripe checkout** — `/api/checkout` creates Stripe Checkout sessions with £49 pricing, FHRSID metadata
-- **Stripe webhook** — `/api/webhook` handles checkout.session.completed: generates checklist → PDF → sends email → records purchase
+- **Stripe webhook** — `/api/webhook` handles checkout.session.completed: generates checklist → PDF → sends email → records purchase (signature verification via constructEvent)
 - **Email delivery** — Resend integration with branded HTML email + PDF attachment
-- **Checkout button component** — Client-side with loading state, error handling, Stripe redirect
+- **Checkout button component** — Client-side with loading state, error handling, consumer cancellation rights checkbox, Stripe redirect
 - **Success page** — `/success` with payment confirmation, generation progress steps, next actions
 - **Purchase tracking** — Supabase hf_purchases table with create/complete lifecycle
 
@@ -46,6 +46,41 @@
 - [ ] Configure Stripe webhook endpoint in Stripe Dashboard
 - [ ] End-to-end test: search → check → checkout → webhook → email delivery
 - [ ] Set NEXT_PUBLIC_BASE_URL in Vercel for correct redirect URLs
+
+## White-Collar Audit Fixes (Phase 1) ✅ 2026-02-20
+
+### Legal/Compliance
+- ✅ Consumer cancellation rights checkbox (Consumer Contracts Regs 2013) — button disabled until confirmed
+- ✅ AI-generated content disclaimer in Terms of Service (new section 5)
+- ✅ Privacy policy updated: pipeline data processing for sole traders, Supabase + Anthropic as processors
+- ✅ Cookie consent banner (localStorage-based, blocks analytics until accepted)
+- ✅ Pre-purchase AI disclaimer on /check/ CTA section
+
+### Security
+- ✅ Security headers: X-Frame-Options DENY, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+
+### Product/UX
+- ✅ Delivery platform urgency warning on /check/ pages (Deliveroo/Just Eat/Uber Eats removal risk)
+- ✅ Brand assets: favicon (32x32, 16x16), apple-touch-icon (180x180), OG image (1200x630)
+- ✅ Removed default Next.js placeholder SVGs
+
+### AI Quality
+- ✅ Allergen management (Natasha's Law) added to Claude checklist prompt
+- ✅ Management documentation weighting strengthened
+- ✅ Reinspection process details added to prompt
+
+### Audit Fixes Still TODO (Phase 2+)
+- [ ] Register hygienefix.co.uk custom domain
+- [ ] Set 6 Vercel env vars to activate revenue
+- [ ] Create sample action plan PDF for preview ("See what you get")
+- [ ] GA4 + GTM with conversion funnel events
+- [ ] UptimeRobot monitoring
+- [ ] Pipeline health alert (email if no successful run in 25h)
+- [ ] Sprint 4 council pages (363 programmatic pages)
+- [ ] Blog content (5 articles, 1,500+ words each)
+- [ ] EH Consultant referral programme
+- [ ] Resend broadcast sequence for subscriber list
+- [ ] Scotland/Wales jurisdiction detection and messaging
 ### 📋 SPRINT 3 (Week 3)
 - [ ] Google Places enrichment (email/phone/website for businesses)
 - [ ] Personalized outreach email templates

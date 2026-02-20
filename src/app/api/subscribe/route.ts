@@ -22,10 +22,16 @@ export async function POST(request: NextRequest) {
       id: subscriber?.id,
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
+    let message: string;
+    if (error instanceof Error) {
+      message = error.message;
+    } else if (typeof error === 'object' && error !== null) {
+      message = JSON.stringify(error);
+    } else {
+      message = String(error);
+    }
     console.error('[Subscribe error]', message);
 
-    // Return the actual error in dev/debug, generic in production
     return NextResponse.json(
       { error: 'Failed to subscribe. Please try again.', debug: message },
       { status: 500 }

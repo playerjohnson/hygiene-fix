@@ -1,6 +1,6 @@
 # HygieneFix — Project Status
 
-## Last Updated: 2026-02-20
+## Last Updated: 2026-02-20 (Session 2)
 
 ## Sprint 1 Progress
 
@@ -12,20 +12,21 @@
 - **Search component** — Live search with postcode/name toggle, debounced API calls, dropdown results with rating badges
 - **Check page** (`/check/[fhrsid]`) — Dynamic SSR page with score breakdown, priority action, CTA for action plan, local authority info
 - **Score breakdown component** — Animated bar chart with colour-coded severity
-- **Email capture component** — Subscribe endpoint (MVP: in-memory, production: Supabase)
+- **Email capture component** — Subscribe endpoint with Supabase backend
 - **Privacy policy** — Comprehensive GDPR-compliant (~900 words)
 - **Terms of service** — Full consumer protection compliance (~700 words)
 - **Sitemap & robots.txt** — Next.js native generation
 - **Design system** — DM Serif Display headings, Nunito Sans body, navy dark theme, rating colour system, grain overlay
 - **Deployed to Vercel** — https://hygiene-fix.vercel.app (production)
+- **Supabase database** — 5 tables (subscribers, establishments, rating_changes, purchases, pipeline_runs) with RLS, indexes, and TypeScript client library
+- **Daily FSA pipeline** — Fetches all 0-2 rated establishments, batch change detection, upserts to Supabase, run tracking with stats
+- **Vercel Cron** — Pipeline runs daily at 04:00 UTC, secured with CRON_SECRET
+- **Pipeline API** — `/api/pipeline/run` with Bearer auth, dry run mode, configurable rating filter
 
 ### 🔜 SPRINT 1 REMAINING
-- [ ] GitHub repo creation and push
 - [ ] Google Search Console setup
 - [ ] GA4 + GTM integration with cookie consent
-- [ ] Supabase database setup (replace in-memory email storage)
-- [ ] Daily data pipeline script (pull 0-2 rated businesses)
-- [ ] Change detection (identify NEW low ratings daily)
+- [ ] Verify pipeline works when FSA API recovers (currently returning 500s — external outage)
 
 ### 📋 SPRINT 2 (Week 2)
 - [ ] Claude API integration for personalized checklist generation
@@ -52,12 +53,25 @@
 - **Frontend:** Next.js 16 (React 19, TypeScript, Tailwind CSS v4)
 - **Hosting:** Vercel (production: hygiene-fix.vercel.app)
 - **Data:** FSA Food Hygiene Rating API (free, no auth required)
+- **Database:** Supabase (project: knwzgnymhefuinoiggav)
 - **Payments:** Stripe (not yet integrated)
 - **Email:** Resend (not yet integrated)
-- **Database:** Supabase (not yet set up)
 - **AI:** Claude API (Sprint 2)
+
+## Supabase Tables (hf_ prefix)
+- `hf_subscribers` — Email capture with dedup, FHRSID linking, source tracking
+- `hf_establishments` — Tracked low-rated businesses with enrichment + outreach fields
+- `hf_rating_changes` — Audit log of detected rating changes
+- `hf_purchases` — Stripe payment tracking for £49 action plans
+- `hf_pipeline_runs` — Daily data pull tracking with stats
+
+## Environment Variables (Vercel)
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key (RLS-restricted)
+- `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role (server-side only)
+- `CRON_SECRET` — Pipeline auth token
 
 ## URLs
 - Production: https://hygiene-fix.vercel.app
-- API test: https://hygiene-fix.vercel.app/api/search?q=SW1A+1AA&type=postcode
+- Pipeline: POST/GET https://hygiene-fix.vercel.app/api/pipeline/run (Bearer auth)
 - Check page example: https://hygiene-fix.vercel.app/check/667428

@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
     }
 
-    // Supabase upsert — deduplicates on email
     const subscriber = await addSubscriber(
       email,
       fhrsid || undefined,
@@ -23,19 +22,12 @@ export async function POST(request: NextRequest) {
       id: subscriber?.id,
     });
   } catch (error: unknown) {
-    console.error('[Subscribe error]', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[Subscribe error]', message);
 
-    // Handle Supabase connection errors gracefully
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    if (message.includes('fetch') || message.includes('SUPABASE')) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable. Please try again.' },
-        { status: 503 }
-      );
-    }
-
+    // Return the actual error in dev/debug, generic in production
     return NextResponse.json(
-      { error: 'Failed to subscribe. Please try again.' },
+      { error: 'Failed to subscribe. Please try again.', debug: message },
       { status: 500 }
     );
   }

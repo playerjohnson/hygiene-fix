@@ -148,7 +148,7 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
 
       {/* Results dropdown — shares border with the widget above */}
       {showResults && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 bg-brand-dark border border-white/10 border-t-0 rounded-b-2xl shadow-2xl overflow-hidden z-50 max-h-[400px] overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 bg-[#0B1B2B] border border-white/10 border-t-0 rounded-b-2xl shadow-2xl overflow-hidden z-50 max-h-[400px] overflow-y-auto" style={{backgroundColor: '#0B1B2B'}}>
           <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between">
             <span className="text-xs text-white/35 font-mono">{totalCount} result{totalCount !== 1 ? 's' : ''} found</span>
             <span className="text-[10px] text-white/20">Click to view score breakdown</span>
@@ -173,7 +173,7 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
       )}
 
       {showResults && error && !loading && (
-        <div className="absolute top-full left-0 right-0 bg-brand-dark border border-amber-500/20 border-t-0 rounded-b-2xl shadow-2xl p-6 z-50 text-center">
+        <div className="absolute top-full left-0 right-0 border border-amber-500/20 border-t-0 rounded-b-2xl shadow-2xl p-6 z-50 text-center" style={{backgroundColor: '#0B1B2B'}}>
           <p className="text-sm text-amber-400/90 mb-2">⚠️ {error}</p>
           <button
             onClick={() => doSearch(query)}
@@ -185,7 +185,7 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
       )}
 
       {showResults && !error && results.length === 0 && !loading && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 bg-brand-dark border border-white/10 border-t-0 rounded-b-2xl shadow-2xl p-6 z-50 text-center">
+        <div className="absolute top-full left-0 right-0 border border-white/10 border-t-0 rounded-b-2xl shadow-2xl p-6 z-50 text-center" style={{backgroundColor: '#0B1B2B'}}>
           <p className="text-sm text-white/50">No businesses found. Try a different {searchType === 'postcode' ? 'postcode' : 'name'}.</p>
         </div>
       )}

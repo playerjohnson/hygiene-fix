@@ -18,33 +18,8 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
   const [error, setError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout>(undefined);
-
-  // Recalculate fixed dropdown position on open or resize
-  useEffect(() => {
-    function calcPos() {
-      if (!wrapperRef.current) return;
-      const rect = wrapperRef.current.getBoundingClientRect();
-      setDropdownStyle({
-        position: 'fixed',
-        top: rect.bottom,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 9999,
-        backgroundColor: '#0B1B2B',
-        boxShadow: '0 24px 48px rgba(0,0,0,0.9)',
-      });
-    }
-    calcPos();
-    window.addEventListener('resize', calcPos);
-    window.addEventListener('scroll', calcPos, { passive: true });
-    return () => {
-      window.removeEventListener('resize', calcPos);
-      window.removeEventListener('scroll', calcPos);
-    };
-  }, [showResults]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -171,11 +146,10 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
         </div>
       </div>
 
-      {/* Dropdown — position: fixed so it can't be painted over by any sibling */}
+      {/* Dropdown — absolute within wrapper, z-index handled by hero section stacking */}
       {dropdownOpen && (
         <div
-          style={dropdownStyle}
-          className="rounded-b-2xl border border-white/10 border-t-0 overflow-hidden max-h-[400px] overflow-y-auto"
+          className="absolute top-full left-0 right-0 rounded-b-2xl border border-white/10 border-t-0 overflow-hidden max-h-[400px] overflow-y-auto z-[9999] bg-brand-navy shadow-[0_24px_48px_rgba(0,0,0,0.9)]"
         >
           {results.length > 0 && (
             <>

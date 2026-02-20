@@ -1,35 +1,33 @@
--- HygieneFix Supabase Schema
--- Run this in Supabase SQL Editor (Dashboard > SQL Editor > New Query)
+-- HygieneFix Tables (hf_ prefix)
+-- Shared Supabase project: knwzgnymhefuinoiggav
+-- Run in: Supabase Dashboard > SQL Editor > New Query
 
 -- ============================================
--- 1. SUBSCRIBERS (email capture from site)
+-- 1. hf_subscribers (email capture from site)
 -- ============================================
-CREATE TABLE IF NOT EXISTS subscribers (
+CREATE TABLE IF NOT EXISTS hf_subscribers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT NOT NULL,
-  fhrsid TEXT,                          -- linked establishment (if they searched one)
-  business_name TEXT,                   -- denormalised for quick reference
-  source TEXT DEFAULT 'website',        -- website, outreach, referral
-  status TEXT DEFAULT 'active'          -- active, unsubscribed, bounced
+  fhrsid TEXT,
+  business_name TEXT,
+  source TEXT DEFAULT 'website',
+  status TEXT DEFAULT 'active'
     CHECK (status IN ('active', 'unsubscribed', 'bounced')),
   subscribed_at TIMESTAMPTZ DEFAULT NOW(),
   unsubscribed_at TIMESTAMPTZ,
-  metadata JSONB DEFAULT '{}'::jsonb    -- flexible extra data
+  metadata JSONB DEFAULT '{}'::jsonb
 );
 
--- Prevent duplicate emails
-CREATE UNIQUE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers (email);
-
--- Fast lookup by FHRSID
-CREATE INDEX IF NOT EXISTS idx_subscribers_fhrsid ON subscribers (fhrsid) WHERE fhrsid IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_hf_subscribers_email ON hf_subscribers (email);
+CREATE INDEX IF NOT EXISTS idx_hf_subscribers_fhrsid ON hf_subscribers (fhrsid) WHERE fhrsid IS NOT NULL;
 
 -- ============================================
--- 2. ESTABLISHMENTS (tracked low-rated businesses)
+-- 2. hf_establishments (tracked low-rated businesses)
 -- ============================================
-CREATE TABLE IF NOT EXISTS establishments (
+CREATE TABLE IF NOT EXISTS hf_establishments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   fhrsid INTEGER NOT NULL UNIQUE,
-  business_name TEXT NOT NULL,
+  business_name TEXT,
   business_type TEXT,
   business_type_id INTEGER,
   rating_value TEXT NOT NULL,
@@ -46,18 +44,15 @@ CREATE TABLE IF NOT EXISTS establishments (
   management_score INTEGER,
   latitude DOUBLE PRECISION,
   longitude DOUBLE PRECISION,
-  -- Enrichment fields (Google Places, etc.)
   contact_email TEXT,
   contact_phone TEXT,
   website TEXT,
   google_place_id TEXT,
   enriched_at TIMESTAMPTZ,
-  -- Pipeline tracking
   first_seen_at TIMESTAMPTZ DEFAULT NOW(),
   last_updated_at TIMESTAMPTZ DEFAULT NOW(),
-  rating_changed_at TIMESTAMPTZ,        -- when we detected a rating change
-  previous_rating TEXT,                  -- what it was before
-  -- Outreach tracking
+  rating_changed_at TIMESTAMPTZ,
+  previous_rating TEXT,
   outreach_status TEXT DEFAULT 'new'
     CHECK (outreach_status IN ('new', 'queued', 'sent', 'opened', 'clicked', 'converted', 'unsubscribed', 'skipped')),
   outreach_sent_at TIMESTAMPTZ,
@@ -65,19 +60,18 @@ CREATE TABLE IF NOT EXISTS establishments (
   outreach_clicked_at TIMESTAMPTZ
 );
 
--- Fast lookups
-CREATE INDEX IF NOT EXISTS idx_establishments_rating ON establishments (rating_value);
-CREATE INDEX IF NOT EXISTS idx_establishments_postcode ON establishments (postcode);
-CREATE INDEX IF NOT EXISTS idx_establishments_la ON establishments (local_authority_code);
-CREATE INDEX IF NOT EXISTS idx_establishments_outreach ON establishments (outreach_status);
-CREATE INDEX IF NOT EXISTS idx_establishments_updated ON establishments (last_updated_at);
+CREATE INDEX IF NOT EXISTS idx_hf_est_rating ON hf_establishments (rating_value);
+CREATE INDEX IF NOT EXISTS idx_hf_est_postcode ON hf_establishments (postcode);
+CREATE INDEX IF NOT EXISTS idx_hf_est_la ON hf_establishments (local_authority_code);
+CREATE INDEX IF NOT EXISTS idx_hf_est_outreach ON hf_establishments (outreach_status);
+CREATE INDEX IF NOT EXISTS idx_hf_est_updated ON hf_establishments (last_updated_at);
 
 -- ============================================
--- 3. RATING CHANGES (audit log of detected changes)
+-- 3. hf_rating_changes (audit log)
 -- ============================================
-CREATE TABLE IF NOT EXISTS rating_changes (
+CREATE TABLE IF NOT EXISTS hf_rating_changes (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  fhrsid INTEGER NOT NULL REFERENCES establishments(fhrsid),
+  fhrsid INTEGER NOT NULL REFERENCES hf_establishments(fhrsid),
   old_rating TEXT NOT NULL,
   new_rating TEXT NOT NULL,
   old_hygiene INTEGER,
@@ -89,19 +83,19 @@ CREATE TABLE IF NOT EXISTS rating_changes (
   detected_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_rating_changes_fhrsid ON rating_changes (fhrsid);
-CREATE INDEX IF NOT EXISTS idx_rating_changes_detected ON rating_changes (detected_at);
+CREATE INDEX IF NOT EXISTS idx_hf_rc_fhrsid ON hf_rating_changes (fhrsid);
+CREATE INDEX IF NOT EXISTS idx_hf_rc_detected ON hf_rating_changes (detected_at);
 
 -- ============================================
--- 4. PURCHASES (action plan sales)
+-- 4. hf_purchases (action plan sales)
 -- ============================================
-CREATE TABLE IF NOT EXISTS purchases (
+CREATE TABLE IF NOT EXISTS hf_purchases (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   fhrsid INTEGER,
   email TEXT NOT NULL,
   stripe_session_id TEXT UNIQUE,
   stripe_payment_intent TEXT,
-  amount_pence INTEGER NOT NULL DEFAULT 4900,  -- £49.00
+  amount_pence INTEGER NOT NULL DEFAULT 4900,
   currency TEXT DEFAULT 'gbp',
   status TEXT DEFAULT 'pending'
     CHECK (status IN ('pending', 'completed', 'refunded', 'failed')),
@@ -112,14 +106,14 @@ CREATE TABLE IF NOT EXISTS purchases (
   metadata JSONB DEFAULT '{}'::jsonb
 );
 
-CREATE INDEX IF NOT EXISTS idx_purchases_email ON purchases (email);
-CREATE INDEX IF NOT EXISTS idx_purchases_fhrsid ON purchases (fhrsid);
-CREATE INDEX IF NOT EXISTS idx_purchases_stripe ON purchases (stripe_session_id);
+CREATE INDEX IF NOT EXISTS idx_hf_purch_email ON hf_purchases (email);
+CREATE INDEX IF NOT EXISTS idx_hf_purch_fhrsid ON hf_purchases (fhrsid);
+CREATE INDEX IF NOT EXISTS idx_hf_purch_stripe ON hf_purchases (stripe_session_id);
 
 -- ============================================
--- 5. PIPELINE RUNS (track daily data pulls)
+-- 5. hf_pipeline_runs (daily data pull tracking)
 -- ============================================
-CREATE TABLE IF NOT EXISTS pipeline_runs (
+CREATE TABLE IF NOT EXISTS hf_pipeline_runs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   run_type TEXT NOT NULL DEFAULT 'daily'
     CHECK (run_type IN ('daily', 'full', 'manual')),
@@ -136,32 +130,19 @@ CREATE TABLE IF NOT EXISTS pipeline_runs (
 );
 
 -- ============================================
--- 6. ROW LEVEL SECURITY (RLS)
+-- 6. ROW LEVEL SECURITY
 -- ============================================
+ALTER TABLE hf_subscribers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hf_establishments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hf_rating_changes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hf_purchases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hf_pipeline_runs ENABLE ROW LEVEL SECURITY;
 
--- Enable RLS on all tables
-ALTER TABLE subscribers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE establishments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE rating_changes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE purchases ENABLE ROW LEVEL SECURITY;
-ALTER TABLE pipeline_runs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "hf_service_subscribers" ON hf_subscribers FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "hf_service_establishments" ON hf_establishments FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "hf_service_rating_changes" ON hf_rating_changes FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "hf_service_purchases" ON hf_purchases FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "hf_service_pipeline_runs" ON hf_pipeline_runs FOR ALL USING (auth.role() = 'service_role');
 
--- Service role can do everything (used by API routes)
-CREATE POLICY "Service role full access" ON subscribers FOR ALL
-  USING (auth.role() = 'service_role');
-CREATE POLICY "Service role full access" ON establishments FOR ALL
-  USING (auth.role() = 'service_role');
-CREATE POLICY "Service role full access" ON rating_changes FOR ALL
-  USING (auth.role() = 'service_role');
-CREATE POLICY "Service role full access" ON purchases FOR ALL
-  USING (auth.role() = 'service_role');
-CREATE POLICY "Service role full access" ON pipeline_runs FOR ALL
-  USING (auth.role() = 'service_role');
-
--- Anon role can insert subscribers (for email capture from frontend)
-CREATE POLICY "Anon can subscribe" ON subscribers FOR INSERT
-  WITH CHECK (auth.role() = 'anon');
-
--- Anon role can read establishments (for public check pages)  
-CREATE POLICY "Anon can read establishments" ON establishments FOR SELECT
-  USING (auth.role() = 'anon');
+CREATE POLICY "hf_anon_subscribe" ON hf_subscribers FOR INSERT WITH CHECK (auth.role() = 'anon');
+CREATE POLICY "hf_anon_read_est" ON hf_establishments FOR SELECT USING (auth.role() = 'anon');

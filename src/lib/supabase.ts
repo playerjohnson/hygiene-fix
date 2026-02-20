@@ -4,16 +4,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const isConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+// Configured if we have URL + at least one key
+const isConfigured = Boolean(supabaseUrl && (supabaseServiceKey || supabaseAnonKey));
+const defaultKey = supabaseServiceKey || supabaseAnonKey;
 
 // Client for browser / public operations (respects RLS)
 export const supabase: SupabaseClient | null = isConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey || defaultKey)
   : null;
 
 // Admin client for server-side operations (bypasses RLS)
 export const supabaseAdmin: SupabaseClient | null = isConfigured
-  ? createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseServiceKey || defaultKey)
   : null;
 
 function requireAdmin(): SupabaseClient {
@@ -34,7 +36,7 @@ export async function addSubscriber(
   source: string = 'website'
 ) {
   const { data, error } = await requireAdmin()
-    .from('subscribers')
+    .from('hf_subscribers')
     .upsert(
       {
         email: email.toLowerCase().trim(),
@@ -55,7 +57,7 @@ export async function addSubscriber(
 
 export async function getSubscriberCount(): Promise<number> {
   const { count, error } = await requireAdmin()
-    .from('subscribers')
+    .from('hf_subscribers')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
@@ -94,7 +96,7 @@ export interface EstablishmentRow {
 
 export async function upsertEstablishment(est: EstablishmentRow) {
   const { data, error } = await requireAdmin()
-    .from('establishments')
+    .from('hf_establishments')
     .upsert(
       {
         ...est,
@@ -116,7 +118,7 @@ export async function upsertEstablishments(establishments: EstablishmentRow[]) {
   }));
 
   const { data, error } = await requireAdmin()
-    .from('establishments')
+    .from('hf_establishments')
     .upsert(rows, { onConflict: 'fhrsid' })
     .select();
 
@@ -126,7 +128,7 @@ export async function upsertEstablishments(establishments: EstablishmentRow[]) {
 
 export async function getEstablishmentByFhrsid(fhrsid: number) {
   const { data, error } = await requireAdmin()
-    .from('establishments')
+    .from('hf_establishments')
     .select('*')
     .eq('fhrsid', fhrsid)
     .single();
@@ -137,7 +139,7 @@ export async function getEstablishmentByFhrsid(fhrsid: number) {
 
 export async function getEstablishmentsByRating(maxRating: number, limit: number = 50) {
   const { data, error } = await requireAdmin()
-    .from('establishments')
+    .from('hf_establishments')
     .select('*')
     .lte('rating_value', String(maxRating))
     .order('rating_value', { ascending: true })
@@ -149,7 +151,7 @@ export async function getEstablishmentsByRating(maxRating: number, limit: number
 
 export async function getNewEstablishments(since: string, limit: number = 100) {
   const { data, error } = await requireAdmin()
-    .from('establishments')
+    .from('hf_establishments')
     .select('*')
     .gte('first_seen_at', since)
     .eq('outreach_status', 'new')
@@ -176,7 +178,7 @@ export async function recordRatingChange(change: {
   new_management?: number;
 }) {
   const { data, error } = await requireAdmin()
-    .from('rating_changes')
+    .from('hf_rating_changes')
     .insert(change)
     .select()
     .single();
@@ -191,7 +193,7 @@ export async function recordRatingChange(change: {
 
 export async function startPipelineRun(runType: 'daily' | 'full' | 'manual' = 'daily') {
   const { data, error } = await requireAdmin()
-    .from('pipeline_runs')
+    .from('hf_pipeline_runs')
     .insert({ run_type: runType })
     .select()
     .single();
@@ -211,7 +213,7 @@ export async function completePipelineRun(
   }
 ) {
   const { error } = await requireAdmin()
-    .from('pipeline_runs')
+    .from('hf_pipeline_runs')
     .update({
       status: 'completed',
       completed_at: new Date().toISOString(),
@@ -233,7 +235,7 @@ export async function createPurchase(purchase: {
   amount_pence?: number;
 }) {
   const { data, error } = await requireAdmin()
-    .from('purchases')
+    .from('hf_purchases')
     .insert({
       ...purchase,
       amount_pence: purchase.amount_pence || 4900,
@@ -247,7 +249,7 @@ export async function createPurchase(purchase: {
 
 export async function completePurchase(stripeSessionId: string, paymentIntent: string) {
   const { data, error } = await requireAdmin()
-    .from('purchases')
+    .from('hf_purchases')
     .update({
       status: 'completed',
       stripe_payment_intent: paymentIntent,

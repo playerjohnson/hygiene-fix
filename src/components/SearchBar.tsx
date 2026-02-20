@@ -149,7 +149,8 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
       {/* Dropdown — absolute within wrapper, z-index handled by hero section stacking */}
       {dropdownOpen && (
         <div
-          className="absolute top-full left-0 right-0 rounded-b-2xl border border-white/10 border-t-0 overflow-hidden max-h-[400px] overflow-y-auto z-[9999] bg-brand-navy shadow-[0_24px_48px_rgba(0,0,0,0.9)]"
+          className="absolute top-full left-0 right-0 rounded-b-2xl border border-white/10 border-t-0 overflow-hidden max-h-[400px] overflow-y-auto z-[9999] shadow-[0_24px_48px_rgba(0,0,0,0.9)]"
+          style={{ backgroundColor: '#0B1B2B' }}
         >
           {results.length > 0 && (
             <>

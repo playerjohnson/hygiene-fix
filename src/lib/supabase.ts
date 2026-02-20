@@ -135,6 +135,22 @@ export async function getEstablishmentByFhrsid(fhrsid: number) {
   return data;
 }
 
+/**
+ * Batch lookup: get multiple establishments by FHRSID array.
+ * Uses Supabase 'in' filter for a single query.
+ */
+export async function getEstablishmentsByFhrsids(fhrsids: number[]) {
+  if (fhrsids.length === 0) return [];
+
+  const { data, error } = await requireAdmin()
+    .from('hf_establishments')
+    .select('fhrsid, rating_value, hygiene_score, structural_score, management_score')
+    .in('fhrsid', fhrsids);
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getEstablishmentsByRating(maxRating: number, limit: number = 50) {
   const { data, error } = await requireAdmin()
     .from('hf_establishments')

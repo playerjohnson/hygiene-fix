@@ -15,6 +15,7 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
   const [searchType, setSearchType] = useState<'postcode' | 'name'>('postcode');
   const [results, setResults] = useState<FSAEstablishment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -31,8 +32,9 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
   }, []);
 
   const doSearch = async (q: string) => {
-    if (q.length < 2) { setResults([]); setShowResults(false); return; }
+    if (q.length < 2) { setResults([]); setShowResults(false); setError(null); return; }
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&type=${searchType}`);
       if (res.ok) {
@@ -40,9 +42,16 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
         setResults(data.establishments || []);
         setTotalCount(data.meta?.totalCount || 0);
         setShowResults(true);
+      } else {
+        setResults([]);
+        setError('The food hygiene database is temporarily unavailable. Please try again in a few minutes.');
+        setShowResults(true);
       }
     } catch (err) {
       console.error('Search error:', err);
+      setResults([]);
+      setError('Could not connect to the search service. Please check your connection and try again.');
+      setShowResults(true);
     } finally {
       setLoading(false);
     }
@@ -109,7 +118,7 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
         )}
         {!loading && query && (
           <button
-            onClick={() => { setQuery(''); setResults([]); setShowResults(false); }}
+            onClick={() => { setQuery(''); setResults([]); setShowResults(false); setError(null); }}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
           >
             <X className={isHero ? 'w-5 h-5' : 'w-4 h-4'} />
@@ -142,7 +151,19 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
         </div>
       )}
 
-      {showResults && results.length === 0 && !loading && query.length >= 2 && (
+      {showResults && error && !loading && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-brand-dark border border-amber-500/20 rounded-2xl shadow-2xl p-6 z-50 text-center">
+          <p className="text-sm text-amber-400/90 mb-2">⚠️ {error}</p>
+          <button
+            onClick={() => doSearch(query)}
+            className="text-xs text-brand-sky hover:text-white transition-colors underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {showResults && !error && results.length === 0 && !loading && query.length >= 2 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-brand-dark border border-white/10 rounded-2xl shadow-2xl p-6 z-50 text-center">
           <p className="text-sm text-white/50">No businesses found. Try a different {searchType === 'postcode' ? 'postcode' : 'name'}.</p>
         </div>

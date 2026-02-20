@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
     }
 
-    const subscriber = await addSubscriber(
+    await addSubscriber(
       email,
       fhrsid || undefined,
       businessName || undefined,
@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Subscribed successfully',
-      id: subscriber?.id,
     });
   } catch (error: unknown) {
     let message: string;

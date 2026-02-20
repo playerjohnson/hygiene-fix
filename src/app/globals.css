@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-navy: #0B1B2B;
+  --color-brand-dark: #122338;
+  --color-brand-slate: #1E3450;
+  --color-brand-blue: #2563EB;
+  --color-brand-sky: #38BDF8;
+  --color-brand-amber: #F59E0B;
+  --color-brand-orange: #EA580C;
+  --color-brand-red: #DC2626;
+  --color-brand-green: #16A34A;
+  --color-brand-lime: #84CC16;
+  
+  --color-rating-0: #DC2626;
+  --color-rating-1: #EA580C;
+  --color-rating-2: #F59E0B;
+  --color-rating-3: #84CC16;
+  --color-rating-4: #16A34A;
+  --color-rating-5: #059669;
+
+  --font-display: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Nunito Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, #0B1B2B 0%, #0F2337 50%, #0B1B2B 100%);
+}
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Rating badge glow effects */
+.rating-glow-0 { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+.rating-glow-1 { box-shadow: 0 0 20px rgba(234, 88, 12, 0.3); }
+.rating-glow-2 { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+.rating-glow-3 { box-shadow: 0 0 15px rgba(132, 204, 22, 0.2); }
+.rating-glow-4 { box-shadow: 0 0 15px rgba(22, 163, 74, 0.2); }
+.rating-glow-5 { box-shadow: 0 0 15px rgba(5, 150, 105, 0.2); }
+
+/* Score bar animation */
+.score-bar {
+  transition: width 1s ease-out;
+}
+
+/* Staggered animations */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Focus styles */
+input:focus, button:focus-visible {
+  outline: 2px solid #38BDF8;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0B1B2B; }
+::-webkit-scrollbar-thumb { background: #1E3450; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2563EB; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.6s ease-out both; }
+.animate-slide-up { animation: slideUp 0.5s ease-out both; }

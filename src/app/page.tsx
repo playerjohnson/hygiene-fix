@@ -88,7 +88,7 @@ export default function HomePage() {
           </p>
 
           {/* Search */}
-          <div className="max-w-xl mx-auto animate-slide-up stagger-2">
+          <div className="max-w-xl mx-auto animate-slide-up stagger-2 relative z-50">
             <SearchBar size="hero" />
           </div>
 

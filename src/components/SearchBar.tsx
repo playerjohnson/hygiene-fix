@@ -75,7 +75,7 @@ export default function SearchBar({ onSelect, size = 'default' }: SearchBarProps
   const isHero = size === 'hero';
 
   return (
-    <div ref={wrapperRef} className="relative w-full">
+    <div ref={wrapperRef} className="relative w-full z-50">
       {/* Search type toggle */}
       <div className="flex gap-1 mb-2">
         <button

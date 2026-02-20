@@ -1,27 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// For MVP, store in-memory (replace with Supabase later)
-const subscribers: { email: string; fhrsid?: string; timestamp: string }[] = [];
+import { addSubscriber } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, fhrsid } = await request.json();
+    const { email, fhrsid, businessName } = await request.json();
 
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
     }
 
-    // Store subscriber (MVP: in-memory, production: Supabase)
-    subscribers.push({
+    // Supabase upsert — deduplicates on email
+    const subscriber = await addSubscriber(
       email,
-      fhrsid,
-      timestamp: new Date().toISOString(),
+      fhrsid || undefined,
+      businessName || undefined,
+      'website'
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: 'Subscribed successfully',
+      id: subscriber?.id,
     });
+  } catch (error: unknown) {
+    console.error('[Subscribe error]', error);
 
-    console.log(`[Subscribe] ${email} for FHRSID: ${fhrsid || 'general'}`);
+    // Handle Supabase connection errors gracefully
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    if (message.includes('fetch') || message.includes('SUPABASE')) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable. Please try again.' },
+        { status: 503 }
+      );
+    }
 
-    return NextResponse.json({ success: true, message: 'Subscribed successfully' });
-  } catch {
-    return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to subscribe. Please try again.' },
+      { status: 500 }
+    );
   }
 }

@@ -5,10 +5,11 @@ import { Mail, CheckCircle, Loader2 } from 'lucide-react';
 
 interface EmailCaptureProps {
   fhrsid?: string;
+  businessName?: string;
   context?: string;
 }
 
-export default function EmailCapture({ fhrsid, context = 'Get your free improvement checklist' }: EmailCaptureProps) {
+export default function EmailCapture({ fhrsid, businessName, context = 'Get your free improvement checklist' }: EmailCaptureProps) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -26,7 +27,7 @@ export default function EmailCapture({ fhrsid, context = 'Get your free improvem
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, fhrsid }),
+        body: JSON.stringify({ email, fhrsid, businessName }),
       });
 
       if (res.ok) {

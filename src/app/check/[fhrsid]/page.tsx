@@ -173,6 +173,7 @@ export default async function CheckPage({ params }: PageProps) {
           <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
             <EmailCapture
               fhrsid={String(est.FHRSID)}
+              businessName={est.BusinessName}
               context={isLow
                 ? 'Get free improvement tips for your specific scores:'
                 : 'Get food safety tips and regulation updates:'

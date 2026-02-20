@@ -40,7 +40,9 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="font-display text-lg font-bold text-white/80 mb-3">4. Food Hygiene Rating Data</h2>
-            <p>Food hygiene ratings displayed on this site are sourced from the Food Standards Agency&apos;s public API under the Open Government Licence v3.0. This data is publicly available and does not constitute personal data when relating to business premises. We do not create a database of personal addresses.</p>
+            <p>Food hygiene ratings displayed on this site are sourced from the Food Standards Agency&apos;s public API under the Open Government Licence v3.0. This data is publicly available and includes business names, addresses, ratings, and local authority information.</p>
+            <p>We maintain a database of food establishments rated 0–2 on the Food Hygiene Rating Scheme to provide our service and detect rating changes. This data is refreshed daily from the FSA register. For sole traders operating food businesses, this publicly available data may be associated with an individual and may therefore constitute personal data under UK GDPR. The lawful basis for this processing is legitimate interest in providing a service that helps food businesses improve their hygiene standards.</p>
+            <p>Establishments that have been rated 3 or above for six or more months are removed from our active database. If you are a sole trader and wish to have your data removed from our database, contact privacy@hygienefix.co.uk.</p>
           </section>
 
           <section>
@@ -57,6 +59,8 @@ export default function PrivacyPage() {
             <p><strong className="text-white/70">Stripe:</strong> Payment processing (USA-based, PCI DSS Level 1 certified).</p>
             <p><strong className="text-white/70">Vercel:</strong> Website hosting (USA-based).</p>
             <p><strong className="text-white/70">Resend:</strong> Transactional email delivery (USA-based).</p>
+            <p><strong className="text-white/70">Supabase:</strong> Database hosting for service data (USA-based).</p>
+            <p><strong className="text-white/70">Anthropic:</strong> AI processing for action plan generation. Establishment data is sent to Claude for checklist generation. No personal customer data is included in AI requests.</p>
           </section>
 
           <section>

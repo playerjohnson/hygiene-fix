@@ -140,6 +140,27 @@ export default async function CheckPage({ params }: PageProps) {
           </section>
         )}
 
+        {/* Delivery platform warning */}
+        {isLow && (
+          <section className="mb-10">
+            <div className="p-5 rounded-2xl border border-brand-red/20 bg-brand-red/5">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-brand-red shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-brand-red mb-1">
+                    Your rating may affect delivery platform listings
+                  </p>
+                  <p className="text-sm text-white/50 leading-relaxed">
+                    Businesses rated below 3 risk removal from Deliveroo, Just Eat, and Uber Eats.
+                    For takeaways and restaurants, this can mean losing 30–50% of revenue overnight.
+                    {ratingNum <= 1 && ' At your current rating, removal is likely already in effect.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* CTA: Get action plan */}
         {isLow && (
           <section className="mb-10">
@@ -159,6 +180,10 @@ export default async function CheckPage({ params }: PageProps) {
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Priority ranked</span>
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Re-inspection ready</span>
                   </div>
+                  <p className="text-[10px] text-white/25 mt-3 leading-relaxed">
+                    This action plan is AI-generated based on FSA inspection criteria. It is not a substitute for advice from a
+                    qualified Environmental Health Professional. HygieneFix accepts no liability for reinspection outcomes.
+                  </p>
                 </div>
                 <CheckoutButton fhrsid={String(est.FHRSID)} businessName={est.BusinessName} />
               </div>

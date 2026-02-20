@@ -38,33 +38,38 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-bold text-white/80 mb-3">5. Paid Action Plans</h2>
-            <p>Action plans are delivered as digital content. Payment is processed securely by Stripe. By purchasing an action plan, you consent to immediate delivery of the digital content and acknowledge that you lose your right to cancel under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 once the action plan has been generated.</p>
+            <h2 className="font-display text-lg font-bold text-white/80 mb-3">5. AI-Generated Content</h2>
+            <p>Action plans are generated using artificial intelligence based on publicly available FSA inspection criteria and your establishment&apos;s specific score breakdown. While we strive for accuracy, AI-generated advice may contain errors or omissions. The action plans do not constitute professional food safety advice and should not be relied upon as such. We strongly recommend using the action plan alongside guidance from a qualified Environmental Health Practitioner. HygieneFix accepts no liability for reinspection outcomes, enforcement decisions, or any actions taken based on the AI-generated content.</p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-bold text-white/80 mb-3">6. Paid Action Plans &amp; Cancellation</h2>
+            <p>Action plans are delivered as digital content. Payment is processed securely by Stripe. By purchasing an action plan, you consent to immediate delivery of the digital content and acknowledge that you lose your right to cancel under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 once the action plan has been generated. You must confirm this consent via a checkbox before proceeding to payment.</p>
             <p>We offer a 30-day money-back guarantee. If you are unsatisfied with your action plan for any reason, contact us within 30 days of purchase for a full refund.</p>
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-bold text-white/80 mb-3">6. Acceptable Use</h2>
+            <h2 className="font-display text-lg font-bold text-white/80 mb-3">7. Acceptable Use</h2>
             <p>You agree not to: use the service for any unlawful purpose; attempt to access data for businesses you do not own or manage for purposes of harassment or defamation; scrape, harvest, or bulk-download data from the service; attempt to circumvent any rate limiting or security measures; misrepresent your identity or affiliation with a business.</p>
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-bold text-white/80 mb-3">7. Intellectual Property</h2>
+            <h2 className="font-display text-lg font-bold text-white/80 mb-3">8. Intellectual Property</h2>
             <p>The HygieneFix name, logo, website design, and action plan format are the intellectual property of HygieneFix. Food hygiene rating data is Crown copyright, used under the Open Government Licence v3.0. You may use your purchased action plan for internal business purposes. You may not resell, redistribute, or commercially exploit action plans.</p>
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-bold text-white/80 mb-3">8. Governing Law</h2>
+            <h2 className="font-display text-lg font-bold text-white/80 mb-3">9. Governing Law</h2>
             <p>These terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-bold text-white/80 mb-3">9. Changes to Terms</h2>
+            <h2 className="font-display text-lg font-bold text-white/80 mb-3">10. Changes to Terms</h2>
             <p>We may update these terms from time to time. Continued use of the service after changes constitutes acceptance. Material changes will be communicated via email to registered users.</p>
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-bold text-white/80 mb-3">10. Contact</h2>
+            <h2 className="font-display text-lg font-bold text-white/80 mb-3">11. Contact</h2>
             <p>For questions about these terms, contact us at hello@hygienefix.co.uk.</p>
           </section>
         </div>

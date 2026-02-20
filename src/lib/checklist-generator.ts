@@ -117,6 +117,9 @@ REQUIREMENTS:
 - For management scores of 20+, include detailed SFBB implementation steps
 - For hygiene scores of 15+, include specific temperature control and cross-contamination steps
 - For structural scores of 15+, include specific cleaning, maintenance, and pest control steps
+- ALWAYS include an allergen management section covering: Natasha's Law (PPDS allergen labelling since October 2021), allergen information display, staff allergen training records, and cross-contamination procedures for allergens. This is a legal requirement for all food businesses.
+- Ensure management documentation items (HACCP records, temperature logs, cleaning schedules, staff training records) are given strong weighting — these are typically the easiest quick wins for a low-scored business
+- Include reinspection process details: businesses must formally request a revisit from their local authority, fees typically range £150–300, and inspectors usually visit within 3 months of request
 - Include at least 3-5 items per section that scored poorly
 - Use plain English, avoid jargon, be specific and actionable
 - Include food handler training requirements (Level 2 Food Hygiene if management score is poor)

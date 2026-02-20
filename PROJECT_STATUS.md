@@ -1,6 +1,6 @@
 # HygieneFix — Project Status
 
-## Last Updated: 2026-02-20 (Session 2)
+## Last Updated: 2026-02-20 (Session 3)
 
 ## Sprint 1 Progress
 
@@ -21,21 +21,31 @@
 - **Supabase database** — 5 tables (subscribers, establishments, rating_changes, purchases, pipeline_runs) with RLS, indexes, and TypeScript client library
 - **Daily FSA pipeline** — Fetches all 0-2 rated establishments, batch change detection, upserts to Supabase, run tracking with stats
 - **Vercel Cron** — Pipeline runs daily at 04:00 UTC, secured with CRON_SECRET
-- **Pipeline API** — `/api/pipeline/run` with Bearer auth, dry run mode, configurable rating filter
 
-### 🔜 SPRINT 1 REMAINING
+### 🔜 SPRINT 1 REMAINING (deferred until custom domain)
 - [ ] Google Search Console setup
 - [ ] GA4 + GTM integration with cookie consent
-- [ ] Verify pipeline works when FSA API recovers (currently returning 500s — external outage)
+- [ ] Verify pipeline works when FSA API recovers
 
-### 📋 SPRINT 2 (Week 2)
-- [ ] Claude API integration for personalized checklist generation
-- [ ] Checklist template with score-based personalization
-- [ ] Business-type-specific modules
-- [ ] PDF generation (action plan)
-- [ ] Stripe payment integration (£49)
-- [ ] Email delivery via Resend
+## Sprint 2 Progress
 
+### ✅ COMPLETED
+- **Claude API checklist generator** — Score-based personalised action plan with SFBB references, priority rankings, business-type tailoring
+- **PDF generator** — Branded A4 PDF with jsPDF: cover, score breakdown, checklist sections with checkboxes, re-inspection advice, timeline
+- **Stripe checkout** — `/api/checkout` creates Stripe Checkout sessions with £49 pricing, FHRSID metadata
+- **Stripe webhook** — `/api/webhook` handles checkout.session.completed: generates checklist → PDF → sends email → records purchase
+- **Email delivery** — Resend integration with branded HTML email + PDF attachment
+- **Checkout button component** — Client-side with loading state, error handling, Stripe redirect
+- **Success page** — `/success` with payment confirmation, generation progress steps, next actions
+- **Purchase tracking** — Supabase hf_purchases table with create/complete lifecycle
+
+### 🔜 SPRINT 2 REMAINING
+- [ ] Set Stripe env vars in Vercel (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET)
+- [ ] Set Anthropic env var in Vercel (ANTHROPIC_API_KEY)
+- [ ] Set Resend env var in Vercel (RESEND_API_KEY, FROM_EMAIL)
+- [ ] Configure Stripe webhook endpoint in Stripe Dashboard
+- [ ] End-to-end test: search → check → checkout → webhook → email delivery
+- [ ] Set NEXT_PUBLIC_BASE_URL in Vercel for correct redirect URLs
 ### 📋 SPRINT 3 (Week 3)
 - [ ] Google Places enrichment (email/phone/website for businesses)
 - [ ] Personalized outreach email templates
@@ -54,9 +64,10 @@
 - **Hosting:** Vercel (production: hygiene-fix.vercel.app)
 - **Data:** FSA Food Hygiene Rating API (free, no auth required)
 - **Database:** Supabase (project: knwzgnymhefuinoiggav)
-- **Payments:** Stripe (not yet integrated)
-- **Email:** Resend (not yet integrated)
-- **AI:** Claude API (Sprint 2)
+- **Payments:** Stripe Checkout (£49 action plans)
+- **Email:** Resend (branded HTML + PDF attachments)
+- **AI:** Claude Sonnet 4 via Anthropic SDK (checklist generation)
+- **PDF:** jsPDF (server-side A4 generation)
 
 ## Supabase Tables (hf_ prefix)
 - `hf_subscribers` — Email capture with dedup, FHRSID linking, source tracking
@@ -66,12 +77,42 @@
 - `hf_pipeline_runs` — Daily data pull tracking with stats
 
 ## Environment Variables (Vercel)
-- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key (RLS-restricted)
-- `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role (server-side only)
-- `CRON_SECRET` — Pipeline auth token
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL ✅
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key (RLS-restricted) ✅
+- `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role (server-side only) ✅
+- `CRON_SECRET` — Pipeline auth token ✅
+- `STRIPE_SECRET_KEY` — Stripe secret key ⏳
+- `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret ⏳
+- `ANTHROPIC_API_KEY` — Claude API key ⏳
+- `RESEND_API_KEY` — Resend email API key ⏳
+- `FROM_EMAIL` — Sender email address ⏳
+- `NEXT_PUBLIC_BASE_URL` — Production URL for Stripe redirects ⏳
 
 ## URLs
 - Production: https://hygiene-fix.vercel.app
 - Pipeline: POST/GET https://hygiene-fix.vercel.app/api/pipeline/run (Bearer auth)
+- Checkout: POST https://hygiene-fix.vercel.app/api/checkout
+- Webhook: POST https://hygiene-fix.vercel.app/api/webhook (Stripe signature)
+- Success: https://hygiene-fix.vercel.app/success?session_id=...&fhrsid=...
 - Check page example: https://hygiene-fix.vercel.app/check/667428
+
+## Sprint 2 Architecture
+```
+User clicks "Get Action Plan — £49" on /check/[fhrsid]
+    ↓
+POST /api/checkout → creates Stripe Checkout Session → redirect to Stripe
+    ↓
+User completes payment on Stripe
+    ↓
+Stripe sends webhook to POST /api/webhook
+    ↓
+Webhook handler:
+  1. Records purchase in hf_purchases (Supabase)
+  2. Fetches establishment from FSA API
+  3. Calls Claude Sonnet 4 to generate personalised checklist
+  4. Generates branded A4 PDF via jsPDF
+  5. Sends email via Resend (HTML + PDF attachment)
+  6. Marks purchase as completed
+    ↓
+User sees /success page → checks email for PDF
+```

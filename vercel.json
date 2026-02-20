@@ -8,6 +8,9 @@
   "functions": {
     "src/app/api/pipeline/run/route.ts": {
       "maxDuration": 300
+    },
+    "src/app/api/webhook/route.ts": {
+      "maxDuration": 120
     }
   }
 }

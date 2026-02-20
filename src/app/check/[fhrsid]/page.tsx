@@ -7,12 +7,12 @@ import Footer from '@/components/Footer';
 import ScoreBreakdown from '@/components/ScoreBreakdown';
 import EmailCapture from '@/components/EmailCapture';
 import RatingBadge from '@/components/RatingBadge';
+import CheckoutButton from '@/components/CheckoutButton';
 import {
   MapPin,
   Calendar,
   Building2,
   AlertTriangle,
-  ArrowRight,
   ExternalLink,
   Info,
   ShieldCheck,
@@ -160,9 +160,7 @@ export default async function CheckPage({ params }: PageProps) {
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Re-inspection ready</span>
                   </div>
                 </div>
-                <button className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-brand-blue hover:bg-brand-blue/80 text-white font-semibold transition-colors shrink-0 text-sm">
-                  Get Action Plan — £49 <ArrowRight className="w-4 h-4" />
-                </button>
+                <CheckoutButton fhrsid={String(est.FHRSID)} businessName={est.BusinessName} />
               </div>
             </div>
           </section>

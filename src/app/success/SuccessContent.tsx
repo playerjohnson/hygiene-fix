@@ -22,10 +22,28 @@ export default function SuccessContent() {
   const [downloading, setDownloading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cachedBlob, setCachedBlob] = useState<Blob | null>(null);
+
+  function triggerDownload(blob: Blob) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'HygieneFix-Action-Plan.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
   async function handleDownload() {
     if (!sessionId) {
       setError('Missing session information. Please contact support.');
+      return;
+    }
+
+    // Serve from cache if available (free, instant)
+    if (cachedBlob) {
+      triggerDownload(cachedBlob);
       return;
     }
 
@@ -41,14 +59,8 @@ export default function SuccessContent() {
       }
 
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'HygieneFix-Action-Plan.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setCachedBlob(blob);
+      triggerDownload(blob);
 
       setDownloaded(true);
     } catch (err) {

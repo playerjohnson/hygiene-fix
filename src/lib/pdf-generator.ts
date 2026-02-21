@@ -320,8 +320,8 @@ function drawSection(doc: jsPDF, y: number, section: ChecklistSection): number {
 
     // Timeframe + SFBB reference
     const metaItems: string[] = [];
-    if (item.timeframe) metaItems.push(`Timeframe: ${item.timeframe}`);
-    if (item.sfbbReference) metaItems.push(`SFBB Ref: ${item.sfbbReference}`);
+    if (item.timeframe) metaItems.push(`Complete: ${item.timeframe}`);
+    if (item.sfbbReference) metaItems.push(`SFBB: ${item.sfbbReference}`);
 
     if (metaItems.length > 0) {
       y += 1;

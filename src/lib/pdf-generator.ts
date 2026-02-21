@@ -320,8 +320,8 @@ function drawSection(doc: jsPDF, y: number, section: ChecklistSection): number {
 
     // Timeframe + SFBB reference
     const metaItems: string[] = [];
-    if (item.timeframe) metaItems.push(`⏱ ${item.timeframe}`);
-    if (item.sfbbReference) metaItems.push(`📋 SFBB: ${item.sfbbReference}`);
+    if (item.timeframe) metaItems.push(`Timeframe: ${item.timeframe}`);
+    if (item.sfbbReference) metaItems.push(`SFBB Ref: ${item.sfbbReference}`);
 
     if (metaItems.length > 0) {
       y += 1;
@@ -364,18 +364,22 @@ function drawReinspectionAdvice(
   y += 8;
 
   // Estimated timeline box
-  const greenTint = tint(COLORS.green, 0.08);
-  doc.setFillColor(...greenTint);
-  doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 12, 2, 2, 'F');
-  doc.setDrawColor(...COLORS.green);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 12, 2, 2, 'S');
-
+  const timelineText = `Estimated Timeline: ${checklist.estimatedTimeline}`;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
+  const timelineLines = doc.splitTextToSize(timelineText, CONTENT_WIDTH - 10);
+  const timelineBoxHeight = Math.max(12, timelineLines.length * 4.5 + 5);
+
+  const greenTint = tint(COLORS.green, 0.08);
+  doc.setFillColor(...greenTint);
+  doc.roundedRect(MARGIN, y, CONTENT_WIDTH, timelineBoxHeight, 2, 2, 'F');
+  doc.setDrawColor(...COLORS.green);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(MARGIN, y, CONTENT_WIDTH, timelineBoxHeight, 2, 2, 'S');
+
   doc.setTextColor(...COLORS.green);
-  doc.text(`Estimated Timeline: ${checklist.estimatedTimeline}`, MARGIN + 5, y + 7);
-  y += 18;
+  doc.text(timelineLines, MARGIN + 5, y + 7);
+  y += timelineBoxHeight + 6;
 
   // Re-inspection advice
   doc.setFont('helvetica', 'normal');
@@ -400,14 +404,14 @@ function drawReinspectionAdvice(
     'Complete all critical and high-priority items on this checklist',
     'Ensure your SFBB/HACCP documentation is fully up to date',
     'Have proof of staff training (Level 2 certificates)',
-    'Contact your local authority — re-inspections typically cost £150–200',
+    'Contact your local authority - re-inspections typically cost £150-200',
   ];
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.darkGray);
   tips.forEach((tip, i) => {
-    doc.text(`✓  ${tip}`, MARGIN + 5, y + 13 + i * 4.5);
+    doc.text(`-  ${tip}`, MARGIN + 5, y + 13 + i * 4.5);
   });
 
   y += 38;

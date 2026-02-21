@@ -1,6 +1,6 @@
 # HygieneFix — Project Status
 
-## Last Updated: 2026-02-21 (Session 5 — Env Vars Confirmed)
+## Last Updated: 2026-02-21 (Session 6 — Phase 2 Content & Growth)
 
 ## Sprint 1 Progress
 
@@ -73,15 +73,18 @@
 - [ ] Register hygienefix.co.uk custom domain
 - [x] Set 6 Vercel env vars to activate revenue ✅ All 10 env vars confirmed set
 - [ ] End-to-end test purchase with test card
-- [ ] Create sample action plan PDF for preview ("See what you get")
+- [x] Create sample action plan PDF for preview ✅ /api/sample-plan with links on homepage + /check/
 - [ ] GA4 + GTM with conversion funnel events
 - [ ] UptimeRobot monitoring
 - [ ] Pipeline health alert (email if no successful run in 25h)
-- [ ] Sprint 4 council pages (363 programmatic pages)
-- [ ] Blog content (5 articles, 1,500+ words each)
-- [ ] EH Consultant referral programme
-- [ ] Resend broadcast sequence for subscriber list
-- [ ] Scotland/Wales jurisdiction detection and messaging
+- [x] Sprint 4 council pages ✅ /ratings/[council] with generateStaticParams for all UK authorities
+- [x] Blog content ✅ 6 articles (1,500+ words each) with Article schema
+- [x] EH Consultant referral programme ✅ /partners page with 20% commission, email application
+- [x] Resend broadcast sequence ✅ 4 email templates, /api/broadcast with CRON_SECRET auth, /unsubscribe flow
+- [x] Scotland/Wales jurisdiction detection ✅ FHIS notices, Wales mandatory display warning, integrated into /check/
+- [x] FAQ page with FAQPage schema ✅ /faq with 14 questions, Google rich results markup
+- [x] HygieneFix vs SFBB comparison content ✅ Blog post
+
 ### 📋 SPRINT 3 (Week 3)
 - [ ] Google Places enrichment (email/phone/website for businesses)
 - [ ] Personalized outreach email templates
@@ -89,11 +92,11 @@
 - [ ] Personalized landing pages (/check/[FHRSID])
 - [ ] Outreach tracking and cadence automation
 
-### 📋 SPRINT 4 (Week 4)
-- [ ] Programmatic pages (/ratings/[council] × 363)
-- [ ] Blog content (5 articles, 1,500+ words each)
-- [ ] Consultant directory (/consultants/[region])
-- [ ] Consultant signup and referral tracking
+### 📋 SPRINT 4 — ✅ COMPLETE
+- [x] Programmatic pages (/ratings/[council]) ✅
+- [x] Blog content (6 articles, 1,500+ words each) ✅
+- [x] Partner referral programme (/partners) ✅
+- [x] FAQ page with schema markup (/faq) ✅
 
 ## Technical Stack
 - **Frontend:** Next.js 16 (React 19, TypeScript, Tailwind CSS v4)

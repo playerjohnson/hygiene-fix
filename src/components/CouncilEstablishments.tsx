@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import RatingBadge from '@/components/RatingBadge';
-import { Search, MapPin, Building2, ArrowRight, X } from 'lucide-react';
+import { Search, MapPin, Building2, ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Establishment {
   FHRSID: number;
@@ -20,8 +20,11 @@ interface Props {
   authorityName: string;
 }
 
+const PAGE_SIZE = 20;
+
 export default function CouncilEstablishments({ establishments, totalCount, authorityName }: Props) {
   const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return establishments;
@@ -35,22 +38,30 @@ export default function CouncilEstablishments({ establishments, totalCount, auth
     });
   }, [query, establishments]);
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    setPage(1);
+  }
+
   return (
     <>
       {/* Filter input */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Filter by name, postcode, or type…`}
+            onChange={(e) => handleQueryChange(e.target.value)}
+            placeholder="Filter by name, postcode, or type…"
             className="w-full pl-11 pr-10 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-white placeholder:text-white/30 focus:border-brand-sky/40 focus:outline-none transition-colors"
           />
           {query && (
             <button
-              onClick={() => setQuery('')}
+              onClick={() => handleQueryChange('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-white/30 hover:text-white/60 transition-colors"
             >
               <X className="w-4 h-4" />
@@ -65,9 +76,9 @@ export default function CouncilEstablishments({ establishments, totalCount, auth
       </div>
 
       {/* Results */}
-      {filtered.length > 0 ? (
+      {paged.length > 0 ? (
         <div className="space-y-3">
-          {filtered.map((est) => {
+          {paged.map((est) => {
             const address = [est.AddressLine1, est.PostCode].filter(Boolean).join(', ');
             return (
               <Link
@@ -96,9 +107,52 @@ export default function CouncilEstablishments({ establishments, totalCount, auth
         </p>
       )}
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="p-2 rounded-lg border border-white/10 text-white/50 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+              .map((p, idx, arr) => {
+                const prev = arr[idx - 1];
+                const showEllipsis = prev && p - prev > 1;
+                return (
+                  <span key={p} className="flex items-center gap-1">
+                    {showEllipsis && <span className="text-xs text-white/20 px-1">…</span>}
+                    <button
+                      onClick={() => setPage(p)}
+                      className={`min-w-[2rem] h-8 rounded-lg text-xs font-semibold transition-colors ${
+                        p === page
+                          ? 'bg-brand-blue text-white'
+                          : 'text-white/50 hover:text-white hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  </span>
+                );
+              })}
+          </div>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="p-2 rounded-lg border border-white/10 text-white/50 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {!query && totalCount > establishments.length && (
         <p className="text-xs text-white/30 mt-4 text-center">
-          Showing {establishments.length} of {totalCount.toLocaleString()} businesses.
+          Showing {establishments.length} of {totalCount.toLocaleString()} businesses in {authorityName}.
         </p>
       )}
     </>

@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { ShieldCheck, Menu, X, Search } from 'lucide-react';
+import { ShieldCheck, Menu, X, MapPin } from 'lucide-react';
 
 const NAV_LINKS = [
   { href: '/#how-it-works', label: 'How It Works' },
   { href: '/#pricing', label: 'Pricing' },
-  { href: '/#faq', label: 'FAQ' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/faq', label: 'FAQ' },
 ];
 
 export default function Header() {
@@ -43,11 +44,11 @@ export default function Header() {
 
         {/* Desktop CTA */}
         <Link
-          href="/#search"
+          href="/#browse-areas"
           className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-sky/10 border border-brand-sky/25 text-brand-sky text-sm font-bold hover:bg-brand-sky/20 transition-colors shrink-0"
         >
-          <Search className="w-3.5 h-3.5" />
-          Check a business
+          <MapPin className="w-3.5 h-3.5" />
+          Browse by Area
         </Link>
 
         {/* Mobile hamburger */}
@@ -76,12 +77,12 @@ export default function Header() {
         </div>
         <div className="mt-3 pt-3 border-t border-white/5">
           <Link
-            href="/#search"
+            href="/#browse-areas"
             onClick={() => setMenuOpen(false)}
             className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-brand-blue/15 border border-brand-sky/20 text-brand-sky text-sm font-bold hover:bg-brand-blue/25 transition-colors"
           >
-            <Search className="w-4 h-4" />
-            Check a business
+            <MapPin className="w-4 h-4" />
+            Browse by Area
           </Link>
         </div>
       </div>

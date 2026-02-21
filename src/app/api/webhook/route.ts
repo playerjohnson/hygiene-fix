@@ -5,6 +5,7 @@ import { generateChecklist } from '@/lib/checklist-generator';
 import { generateActionPlanPDF } from '@/lib/pdf-generator';
 import { sendActionPlanEmail } from '@/lib/email';
 import { createPurchase, completePurchase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -77,6 +78,14 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     // 4. Generate PDF
     console.log('Generating PDF...');
     const pdfBuffer = await generateActionPlanPDF(establishment, checklist);
+
+    // 4b. Cache PDF in Supabase Storage (non-blocking)
+    if (supabaseAdmin) {
+      supabaseAdmin.storage
+        .from('action-plans')
+        .upload(`${session.id}.pdf`, pdfBuffer, { contentType: 'application/pdf', upsert: true })
+        .catch((err: unknown) => console.error('PDF cache failed (non-fatal):', err));
+    }
 
     // 5. Send email with PDF attached
     console.log(`Sending action plan to ${email}...`);

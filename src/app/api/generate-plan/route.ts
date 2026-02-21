@@ -3,11 +3,42 @@ import Stripe from 'stripe';
 import { getEstablishment } from '@/lib/fsa-api';
 import { generateChecklist } from '@/lib/checklist-generator';
 import { generateActionPlanPDF } from '@/lib/pdf-generator';
+import { supabaseAdmin } from '@/lib/supabase';
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2026-01-28.clover',
   });
+}
+
+const BUCKET = 'action-plans';
+
+async function getCachedPDF(sessionId: string): Promise<Buffer | null> {
+  if (!supabaseAdmin) return null;
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(BUCKET)
+      .download(`${sessionId}.pdf`);
+    if (error || !data) return null;
+    const arrayBuffer = await data.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch {
+    return null;
+  }
+}
+
+async function cachePDF(sessionId: string, pdfBuffer: Buffer): Promise<void> {
+  if (!supabaseAdmin) return;
+  try {
+    await supabaseAdmin.storage
+      .from(BUCKET)
+      .upload(`${sessionId}.pdf`, pdfBuffer, {
+        contentType: 'application/pdf',
+        upsert: true,
+      });
+  } catch (err) {
+    console.error('Failed to cache PDF (non-fatal):', err);
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -30,19 +61,34 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing FHRSID in session' }, { status: 400 });
     }
 
-    // 2. Fetch establishment from FSA
+    // 2. Check cache first — free, no AI cost
+    const cached = await getCachedPDF(sessionId);
+    if (cached) {
+      console.log(`Cache hit for session ${sessionId}`);
+      return new NextResponse(new Uint8Array(cached), {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="HygieneFix-Action-Plan.pdf"`,
+          'Cache-Control': 'private, no-store',
+        },
+      });
+    }
+
+    // 3. Cache miss — generate fresh
+    console.log(`Cache miss for session ${sessionId}, generating...`);
+
     const establishment = await getEstablishment(Number(fhrsid));
     if (!establishment) {
       return NextResponse.json({ error: 'Business not found in FSA register' }, { status: 404 });
     }
 
-    // 3. Generate checklist via Claude
     const checklist = await generateChecklist(establishment);
-
-    // 4. Generate PDF
     const pdfBuffer = await generateActionPlanPDF(establishment, checklist);
 
-    // 5. Return PDF as download
+    // 4. Cache for future downloads (async, non-blocking)
+    cachePDF(sessionId, pdfBuffer);
+
+    // 5. Return PDF
     const safeName = establishment.BusinessName
       .replace(/[^a-zA-Z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
@@ -59,7 +105,6 @@ export async function GET(request: NextRequest) {
     console.error('Generate PDF error:', error);
     const raw = error instanceof Error ? error.message : String(error);
 
-    // Map known errors to user-friendly messages
     let message = 'Something went wrong generating your action plan. Please try again.';
     if (raw.includes('credit balance') || raw.includes('billing')) {
       message = 'Our AI service is temporarily unavailable. Your payment is safe — please try downloading again shortly, or contact support for a refund.';

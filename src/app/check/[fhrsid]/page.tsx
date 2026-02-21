@@ -182,36 +182,34 @@ export default async function CheckPage({ params }: PageProps) {
         {isLow && (
           <section className="mb-10">
             <div className="p-6 sm:p-8 rounded-2xl border border-brand-blue/20 bg-gradient-to-br from-brand-blue/10 to-brand-sky/5">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="flex-1">
-                  <h3 className="font-display text-xl font-bold mb-2 flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-brand-sky" />
-                    Get Your Personalised Action Plan
-                  </h3>
-                  <p className="text-sm text-white/50 leading-relaxed mb-4">
-                    A detailed, prioritised checklist tailored to your exact scores. Know exactly what to fix,
-                    in what order, with SFBB documentation guidance and re-inspection preparation.
-                  </p>
-                  <div className="flex flex-wrap gap-3 text-xs text-white/40">
-                    <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Score-specific steps</span>
-                    <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Priority ranked</span>
-                    <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Re-inspection ready</span>
-                  </div>
-                  <a
-                    href="/api/sample-plan"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-brand-sky hover:text-brand-sky/80 mt-3 transition-colors"
-                  >
-                    <FileText className="w-3 h-3" /> See a sample action plan (PDF)
-                  </a>
-                  <p className="text-[10px] text-white/25 mt-3 leading-relaxed">
-                    This action plan is AI-generated based on FSA inspection criteria. It is not a substitute for advice from a
-                    qualified Environmental Health Professional. HygieneFix accepts no liability for reinspection outcomes.
-                  </p>
-                </div>
-                <CheckoutButton fhrsid={String(est.FHRSID)} businessName={est.BusinessName} />
+              <h3 className="font-display text-xl font-bold mb-2 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-brand-sky" />
+                Get Your Personalised Action Plan
+              </h3>
+              <p className="text-sm text-white/50 leading-relaxed mb-4">
+                A detailed, prioritised checklist tailored to your exact scores. Know exactly what to fix,
+                in what order, with SFBB documentation guidance and re-inspection preparation.
+              </p>
+              <div className="flex flex-wrap gap-3 text-xs text-white/40 mb-4">
+                <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Score-specific steps</span>
+                <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Priority ranked</span>
+                <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Re-inspection ready</span>
               </div>
+              <CheckoutButton fhrsid={String(est.FHRSID)} businessName={est.BusinessName} />
+              <div className="flex items-center gap-4 mt-4">
+                <a
+                  href="/api/sample-plan"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-brand-sky hover:text-brand-sky/80 transition-colors"
+                >
+                  <FileText className="w-3 h-3" /> See a sample action plan (PDF)
+                </a>
+              </div>
+              <p className="text-[10px] text-white/25 mt-3 leading-relaxed">
+                This action plan is AI-generated based on FSA inspection criteria. It is not a substitute for advice from a
+                qualified Environmental Health Professional. HygieneFix accepts no liability for reinspection outcomes.
+              </p>
             </div>
           </section>
         )}

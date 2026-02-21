@@ -250,6 +250,16 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
+              <a
+                href="/api/sample-plan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-6 text-sm text-brand-sky hover:text-brand-sky/80 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                See a sample action plan (PDF)
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
             </div>
           </ScrollReveal>
         </section>

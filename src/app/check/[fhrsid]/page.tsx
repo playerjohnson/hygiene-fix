@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getEstablishment } from '@/lib/fsa-api';
 import { interpretRating, formatRatingDate, daysSinceRating, getRatingColor } from '@/lib/scores';
+import { detectJurisdiction } from '@/lib/jurisdiction';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ScoreBreakdown from '@/components/ScoreBreakdown';
@@ -16,6 +17,7 @@ import {
   ExternalLink,
   Info,
   ShieldCheck,
+  FileText,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -48,11 +50,26 @@ export default async function CheckPage({ params }: PageProps) {
     .filter(Boolean)
     .join(', ');
   const ratingColor = getRatingColor(ratingNum);
+  const jurisdiction = detectJurisdiction(est.SchemeType, est.LocalAuthorityName);
 
   return (
     <>
       <Header />
       <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* Jurisdiction notices */}
+        {jurisdiction.notices.length > 0 && (
+          <div className="mb-6 p-4 rounded-xl border border-brand-amber/20 bg-brand-amber/5">
+            <div className="flex items-start gap-3">
+              <Info className="w-4 h-4 text-brand-amber shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                {jurisdiction.notices.map((notice, i) => (
+                  <p key={i} className="text-xs text-white/50 leading-relaxed">{notice}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Back link */}
         <Link
           href="/"
@@ -180,6 +197,14 @@ export default async function CheckPage({ params }: PageProps) {
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Priority ranked</span>
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-brand-green" /> Re-inspection ready</span>
                   </div>
+                  <a
+                    href="/api/sample-plan"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-brand-sky hover:text-brand-sky/80 mt-3 transition-colors"
+                  >
+                    <FileText className="w-3 h-3" /> See a sample action plan (PDF)
+                  </a>
                   <p className="text-[10px] text-white/25 mt-3 leading-relaxed">
                     This action plan is AI-generated based on FSA inspection criteria. It is not a substitute for advice from a
                     qualified Environmental Health Professional. HygieneFix accepts no liability for reinspection outcomes.

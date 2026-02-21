@@ -3,6 +3,8 @@ import Footer from '@/components/Footer';
 import SearchBar from '@/components/SearchBar';
 import EmailCapture from '@/components/EmailCapture';
 import ScrollReveal from '@/components/ScrollReveal';
+import BrowseAreas from '@/components/BrowseAreas';
+import { getAuthorities } from '@/lib/fsa-api';
 import {
   ShieldCheck,
   Search,
@@ -99,7 +101,26 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-export default function HomePage() {
+export const revalidate = 86400; // Revalidate daily
+
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+export default async function HomePage() {
+  let authorities: { name: string; slug: string }[] = [];
+  try {
+    const data = await getAuthorities();
+    authorities = data.authorities
+      .map((a) => ({ name: a.Name, slug: slugify(a.Name) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  } catch {
+    // Fallback — page still renders, just without area links
+  }
+
   return (
     <>
       <Header />
@@ -285,45 +306,11 @@ export default function HomePage() {
               Browse by Area
             </h2>
             <p className="text-center text-white/40 max-w-xl mx-auto mb-10">
-              See food hygiene ratings and low-rated businesses in your local authority area.
+              See food hygiene ratings and low-rated businesses across all {authorities.length} UK local authority areas.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={0.1}>
-            <div className="flex flex-wrap justify-center gap-2.5">
-              {[
-                { name: 'Manchester', slug: 'manchester' },
-                { name: 'Birmingham', slug: 'birmingham' },
-                { name: 'Leeds', slug: 'leeds' },
-                { name: 'Liverpool', slug: 'liverpool' },
-                { name: 'Bristol', slug: 'bristol' },
-                { name: 'Sheffield', slug: 'sheffield' },
-                { name: 'Newcastle', slug: 'newcastle-upon-tyne' },
-                { name: 'Nottingham', slug: 'nottingham-city' },
-                { name: 'Leicester', slug: 'leicester-city' },
-                { name: 'Coventry', slug: 'coventry' },
-                { name: 'Bradford', slug: 'bradford' },
-                { name: 'Brighton', slug: 'brighton-and-hove' },
-                { name: 'Cardiff', slug: 'cardiff' },
-                { name: 'Glasgow', slug: 'glasgow-city' },
-                { name: 'Edinburgh', slug: 'edinburgh-city-of' },
-                { name: 'Southampton', slug: 'southampton' },
-                { name: 'Plymouth', slug: 'plymouth-city' },
-                { name: 'Reading', slug: 'reading' },
-                { name: 'York', slug: 'york' },
-                { name: 'Cambridge', slug: 'cambridge-city' },
-                { name: 'Oxford', slug: 'oxford-city' },
-                { name: 'Bath', slug: 'bath-and-north-east-somerset' },
-                { name: 'Exeter', slug: 'exeter-city' },
-              ].map((area) => (
-                <a
-                  key={area.slug}
-                  href={`/ratings/${area.slug}`}
-                  className="px-4 py-2 rounded-lg border border-white/10 bg-white/[0.02] text-sm text-white/60 hover:text-white hover:border-brand-sky/30 hover:bg-brand-sky/5 transition-all"
-                >
-                  {area.name}
-                </a>
-              ))}
-            </div>
+            <BrowseAreas authorities={authorities} />
           </ScrollReveal>
         </section>
 

@@ -130,3 +130,47 @@ export async function getRatingCounts(): Promise<Record<string, number>> {
 
   return counts;
 }
+
+export interface AuthorityStats {
+  distribution: { rating: number; count: number }[];
+  total: number;
+  lowRatedTotal: number;
+  lowRatedPercent: number;
+}
+
+export async function getAuthorityRatingDistribution(authorityId: number): Promise<AuthorityStats> {
+  const ratings = [0, 1, 2, 3, 4, 5];
+
+  const counts = await Promise.all(
+    ratings.map(async (rating) => {
+      const params = new URLSearchParams({
+        localAuthorityId: String(authorityId),
+        ratingKey: String(rating),
+        ratingOperatorKey: 'Equal',
+        pageSize: '1',
+      });
+
+      try {
+        const res = await fetch(`${FSA_BASE_URL}/Establishments?${params}`, {
+          headers: FSA_HEADERS,
+          next: { revalidate: 86400 },
+        });
+        if (!res.ok) return { rating, count: 0 };
+        const data = await res.json();
+        return { rating, count: data.meta?.totalCount || 0 };
+      } catch {
+        return { rating, count: 0 };
+      }
+    })
+  );
+
+  const total = counts.reduce((sum, c) => sum + c.count, 0);
+  const lowRatedTotal = counts.filter((c) => c.rating <= 2).reduce((sum, c) => sum + c.count, 0);
+
+  return {
+    distribution: counts,
+    total,
+    lowRatedTotal,
+    lowRatedPercent: total > 0 ? Math.round((lowRatedTotal / total) * 100) : 0,
+  };
+}

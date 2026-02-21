@@ -4,8 +4,10 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CouncilEstablishments from '@/components/CouncilEstablishments';
-import { getAuthorities, getLowRatedByAuthority } from '@/lib/fsa-api';
-import { MapPin, AlertTriangle, ArrowRight } from 'lucide-react';
+import AreaStats from '@/components/AreaStats';
+import { getAuthorities, getLowRatedByAuthority, getAuthorityRatingDistribution } from '@/lib/fsa-api';
+import type { AuthorityStats } from '@/lib/fsa-api';
+import { MapPin, AlertTriangle, ArrowRight, BarChart3 } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{ council: string }>;
@@ -48,11 +50,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const name = deslugify(council);
 
   return {
-    title: `Food Hygiene Ratings in ${name} | HygieneFix`,
-    description: `See food hygiene ratings for businesses in ${name}. Find establishments rated 0–2 and get improvement action plans. Updated daily from FSA data.`,
+    title: `Food Hygiene Ratings in ${name} — Statistics & Low-Rated Businesses | HygieneFix`,
+    description: `Food hygiene rating statistics for ${name}. See how many businesses are rated 0–2, rating distribution by type, and browse all low-rated establishments. Updated daily from FSA data.`,
     openGraph: {
-      title: `Food Hygiene Ratings in ${name}`,
-      description: `Check food hygiene ratings in ${name}. ${name} businesses rated 0–2 may need urgent improvements.`,
+      title: `Food Hygiene Ratings in ${name} — Area Statistics`,
+      description: `How many businesses in ${name} are rated 0–2? See rating distribution, business type breakdown, and browse low-rated establishments.`,
     },
   };
 }
@@ -64,9 +66,14 @@ export default async function CouncilPage({ params }: PageProps) {
   const authority = await findAuthority(council);
   if (!authority) notFound();
 
+  // Fetch low-rated establishments and rating distribution in parallel
   let lowRated;
+  let stats: AuthorityStats | null = null;
   try {
-    lowRated = await getLowRatedByAuthority(authority.LocalAuthorityId, 2, 1, 100);
+    [lowRated, stats] = await Promise.all([
+      getLowRatedByAuthority(authority.LocalAuthorityId, 2, 1, 100),
+      getAuthorityRatingDistribution(authority.LocalAuthorityId).catch(() => null),
+    ]);
   } catch {
     lowRated = { establishments: [], meta: { totalCount: 0, itemCount: 0, dataSource: '', extractDate: '', returncode: null, totalPages: 0, pageSize: 100, pageNumber: 1 } };
   }
@@ -74,12 +81,22 @@ export default async function CouncilPage({ params }: PageProps) {
   const totalLow = lowRated.meta?.totalCount || 0;
   const establishments = lowRated.establishments || [];
 
+  // Business type breakdown from loaded establishments
+  const typeMap: Record<string, number> = {};
+  for (const est of establishments) {
+    const t = est.BusinessType || 'Other';
+    typeMap[t] = (typeMap[t] || 0) + 1;
+  }
+  const businessTypeBreakdown = Object.entries(typeMap)
+    .map(([type, count]) => ({ type, count }))
+    .sort((a, b) => b.count - a.count);
+
   return (
     <>
       <Header />
       <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-white/60 transition-colors mb-8">
-          ← Back to search
+        <Link href="/#browse-areas" className="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-white/60 transition-colors mb-8">
+          ← All areas
         </Link>
 
         <div className="mb-10">
@@ -96,6 +113,24 @@ export default async function CouncilPage({ params }: PageProps) {
             Data updated daily from the Food Standards Agency.
           </p>
         </div>
+
+        {/* Area statistics */}
+        {stats && stats.total > 0 && (
+          <section className="mb-10">
+            <h2 className="font-display text-xl font-bold mb-5 flex items-center gap-2">
+              <span className="w-1 h-6 rounded-full bg-brand-sky" />
+              <BarChart3 className="w-5 h-5 text-brand-sky" />
+              Area Statistics
+            </h2>
+            <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
+              <AreaStats
+                stats={stats}
+                authorityName={authority.Name}
+                businessTypeBreakdown={businessTypeBreakdown}
+              />
+            </div>
+          </section>
+        )}
 
         {/* Filterable low-rated businesses */}
         {establishments.length > 0 && (

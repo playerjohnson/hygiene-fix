@@ -1,6 +1,6 @@
 # HygieneFix — Project Status
 
-## Last Updated: 2026-02-21 (Session 6 — Phase 2 Content & Growth)
+## Last Updated: 2026-02-21 (Session 7 — First Successful Test Purchase)
 
 ## Sprint 1 Progress
 
@@ -45,7 +45,10 @@
 - [x] Set Resend env var in Vercel (RESEND_API_KEY, FROM_EMAIL) ✅
 - [x] Set NEXT_PUBLIC_BASE_URL in Vercel for correct redirect URLs ✅
 - [x] Configure Stripe webhook endpoint — signature verification confirmed working ✅
-- [ ] End-to-end test purchase: search → check → checkout → webhook → Claude → PDF → email delivery (use test card 4242...)
+- [x] End-to-end test purchase: search → check → checkout → Claude → PDF → download ✅ 2026-02-21
+  - Direct download via /api/generate-plan (verifies Stripe payment_status=paid)
+  - Preflight checks block checkout if AI service unavailable (prevents taking undeliverable payments)
+  - Webhook email delivery still pending Resend domain verification
 
 ## White-Collar Audit Fixes (Phase 1) ✅ 2026-02-20
 
@@ -72,8 +75,10 @@
 ### Audit Fixes Still TODO (Phase 2+)
 - [ ] Register hygienefix.co.uk custom domain
 - [x] Set 6 Vercel env vars to activate revenue ✅ All 10 env vars confirmed set
-- [ ] End-to-end test purchase with test card
+- [x] End-to-end test purchase with test card ✅ First successful purchase 2026-02-21 (Frydays, FHRSID 1885909)
 - [x] Create sample action plan PDF for preview ✅ /api/sample-plan with links on homepage + /check/
+- [x] Preflight checks before checkout ✅ Blocks payment if AI service unavailable
+- [x] Direct PDF download on success page ✅ /api/generate-plan verifies Stripe payment before generating
 - [ ] GA4 + GTM with conversion funnel events
 - [ ] UptimeRobot monitoring
 - [ ] Pipeline health alert (email if no successful run in 25h)

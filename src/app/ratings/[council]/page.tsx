@@ -12,17 +12,13 @@ interface PageProps {
   params: Promise<{ council: string }>;
 }
 
-// Generate static paths for all councils
+// Build on-demand via ISR — the FSA API rate-limits bulk requests from
+// Vercel build infra (403), so we generate pages on first visit instead.
 export async function generateStaticParams() {
-  try {
-    const data = await getAuthorities();
-    return data.authorities.map((auth) => ({
-      council: slugify(auth.Name),
-    }));
-  } catch {
-    return [];
-  }
+  return [];
 }
+
+export const dynamicParams = true;
 
 function slugify(name: string): string {
   return name
@@ -39,8 +35,13 @@ function deslugify(slug: string): string {
 }
 
 async function findAuthority(slug: string) {
-  const data = await getAuthorities();
-  return data.authorities.find((a) => slugify(a.Name) === slug) || null;
+  try {
+    const data = await getAuthorities();
+    return data.authorities.find((a) => slugify(a.Name) === slug) || null;
+  } catch {
+    // If FSA API is down, return a synthetic authority from the slug
+    return { LocalAuthorityId: 0, Name: deslugify(slug) };
+  }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

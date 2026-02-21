@@ -11,6 +11,15 @@ const NAV_LINKS = [
   { href: '/faq', label: 'FAQ' },
 ];
 
+function scrollToHash(e: React.MouseEvent<HTMLAnchorElement>, hash: string) {
+  const el = document.querySelector(hash);
+  if (el) {
+    e.preventDefault();
+    el.scrollIntoView({ behavior: 'smooth' });
+    window.history.replaceState(null, '', hash);
+  }
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -35,16 +44,25 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-6 text-sm font-semibold text-white/55">
-          {NAV_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-white transition-colors">
-              {l.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((l) => {
+            const hash = l.href.startsWith('/#') ? l.href.slice(1) : null;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={hash ? (e) => scrollToHash(e, hash) : undefined}
+                className="hover:text-white transition-colors"
+              >
+                {l.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Desktop CTA */}
         <Link
           href="/#browse-areas"
+          onClick={(e) => scrollToHash(e, '#browse-areas')}
           className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-sky/10 border border-brand-sky/25 text-brand-sky text-sm font-bold hover:bg-brand-sky/20 transition-colors shrink-0"
         >
           <MapPin className="w-3.5 h-3.5" />
@@ -64,21 +82,30 @@ export default function Header() {
       {/* Mobile nav drawer */}
       <div className={`mobile-nav-drawer ${menuOpen ? 'open' : ''}`}>
         <div className="flex flex-col gap-1">
-          {NAV_LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors"
-            >
-              {l.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((l) => {
+            const hash = l.href.startsWith('/#') ? l.href.slice(1) : null;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={(e) => {
+                  setMenuOpen(false);
+                  if (hash) scrollToHash(e, hash);
+                }}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors"
+              >
+                {l.label}
+              </Link>
+            );
+          })}
         </div>
         <div className="mt-3 pt-3 border-t border-white/5">
           <Link
             href="/#browse-areas"
-            onClick={() => setMenuOpen(false)}
+            onClick={(e) => {
+              setMenuOpen(false);
+              scrollToHash(e, '#browse-areas');
+            }}
             className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-brand-blue/15 border border-brand-sky/20 text-brand-sky text-sm font-bold hover:bg-brand-blue/25 transition-colors"
           >
             <MapPin className="w-4 h-4" />

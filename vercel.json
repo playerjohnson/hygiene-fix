@@ -1,4 +1,5 @@
 {
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- src/ public/ supabase/ next.config.ts tailwind.config.ts package.json",
   "crons": [
     {
       "path": "/api/pipeline/run",

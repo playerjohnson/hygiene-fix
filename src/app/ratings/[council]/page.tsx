@@ -3,10 +3,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import SearchBar from '@/components/SearchBar';
-import RatingBadge from '@/components/RatingBadge';
+import CouncilEstablishments from '@/components/CouncilEstablishments';
 import { getAuthorities, getLowRatedByAuthority } from '@/lib/fsa-api';
-import { MapPin, AlertTriangle, ArrowRight, Building2 } from 'lucide-react';
+import { MapPin, AlertTriangle, ArrowRight } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{ council: string }>;
@@ -67,9 +66,9 @@ export default async function CouncilPage({ params }: PageProps) {
 
   let lowRated;
   try {
-    lowRated = await getLowRatedByAuthority(authority.LocalAuthorityId, 2, 1, 20);
+    lowRated = await getLowRatedByAuthority(authority.LocalAuthorityId, 2, 1, 100);
   } catch {
-    lowRated = { establishments: [], meta: { totalCount: 0, itemCount: 0, dataSource: '', extractDate: '', returncode: null, totalPages: 0, pageSize: 20, pageNumber: 1 } };
+    lowRated = { establishments: [], meta: { totalCount: 0, itemCount: 0, dataSource: '', extractDate: '', returncode: null, totalPages: 0, pageSize: 100, pageNumber: 1 } };
   }
 
   const totalLow = lowRated.meta?.totalCount || 0;
@@ -98,15 +97,7 @@ export default async function CouncilPage({ params }: PageProps) {
           </p>
         </div>
 
-        {/* Search widget */}
-        <section className="mb-10">
-          <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
-            <h2 className="font-display text-lg font-bold mb-4">Search businesses in {authority.Name}</h2>
-            <SearchBar />
-          </div>
-        </section>
-
-        {/* Low-rated businesses */}
+        {/* Filterable low-rated businesses */}
         {establishments.length > 0 && (
           <section className="mb-10">
             <h2 className="font-display text-xl font-bold mb-5 flex items-center gap-2">
@@ -114,35 +105,11 @@ export default async function CouncilPage({ params }: PageProps) {
               Businesses Rated 0–2
               <span className="text-sm font-normal text-white/30 ml-2">({totalLow} total)</span>
             </h2>
-            <div className="space-y-3">
-              {establishments.map((est) => {
-                const address = [est.AddressLine1, est.PostCode].filter(Boolean).join(', ');
-                return (
-                  <Link
-                    key={est.FHRSID}
-                    href={`/check/${est.FHRSID}`}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
-                  >
-                    <RatingBadge rating={est.RatingValue} size="sm" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white/80 truncate group-hover:text-white transition-colors">
-                        {est.BusinessName}
-                      </p>
-                      <div className="flex items-center gap-3 text-xs text-white/35 mt-0.5">
-                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {address}</span>
-                        <span className="flex items-center gap-1"><Building2 className="w-3 h-3" /> {est.BusinessType}</span>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-brand-sky transition-colors shrink-0" />
-                  </Link>
-                );
-              })}
-            </div>
-            {totalLow > 20 && (
-              <p className="text-xs text-white/30 mt-4 text-center">
-                Showing 20 of {totalLow.toLocaleString()} businesses. Search above for specific businesses.
-              </p>
-            )}
+            <CouncilEstablishments
+              establishments={establishments}
+              totalCount={totalLow}
+              authorityName={authority.Name}
+            />
           </section>
         )}
 

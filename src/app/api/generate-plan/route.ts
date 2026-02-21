@@ -57,7 +57,18 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Generate PDF error:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: `Failed to generate action plan: ${message}` }, { status: 500 });
+    const raw = error instanceof Error ? error.message : String(error);
+
+    // Map known errors to user-friendly messages
+    let message = 'Something went wrong generating your action plan. Please try again.';
+    if (raw.includes('credit balance') || raw.includes('billing')) {
+      message = 'Our AI service is temporarily unavailable. Your payment is safe — please try downloading again shortly, or contact support for a refund.';
+    } else if (raw.includes('overloaded') || raw.includes('rate_limit')) {
+      message = 'Our AI service is experiencing high demand. Please wait a moment and try downloading again.';
+    } else if (raw.includes('not found') || raw.includes('404')) {
+      message = 'Business not found in the FSA register. Please contact support.';
+    }
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

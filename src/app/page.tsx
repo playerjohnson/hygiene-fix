@@ -278,6 +278,55 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── Browse by area ── */}
+        <section id="browse-areas" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+          <ScrollReveal>
+            <h2 className="font-display text-3xl font-bold text-center mb-3">
+              Browse by Area
+            </h2>
+            <p className="text-center text-white/40 max-w-xl mx-auto mb-10">
+              See food hygiene ratings and low-rated businesses in your local authority area.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={0.1}>
+            <div className="flex flex-wrap justify-center gap-2.5">
+              {[
+                { name: 'Manchester', slug: 'manchester' },
+                { name: 'Birmingham', slug: 'birmingham' },
+                { name: 'Leeds', slug: 'leeds' },
+                { name: 'Liverpool', slug: 'liverpool' },
+                { name: 'Bristol', slug: 'bristol' },
+                { name: 'Sheffield', slug: 'sheffield' },
+                { name: 'Newcastle', slug: 'newcastle-upon-tyne' },
+                { name: 'Nottingham', slug: 'nottingham-city' },
+                { name: 'Leicester', slug: 'leicester-city' },
+                { name: 'Coventry', slug: 'coventry' },
+                { name: 'Bradford', slug: 'bradford' },
+                { name: 'Brighton', slug: 'brighton-and-hove' },
+                { name: 'Cardiff', slug: 'cardiff' },
+                { name: 'Glasgow', slug: 'glasgow-city' },
+                { name: 'Edinburgh', slug: 'edinburgh-city-of' },
+                { name: 'Southampton', slug: 'southampton' },
+                { name: 'Plymouth', slug: 'plymouth-city' },
+                { name: 'Reading', slug: 'reading' },
+                { name: 'York', slug: 'york' },
+                { name: 'Cambridge', slug: 'cambridge-city' },
+                { name: 'Oxford', slug: 'oxford-city' },
+                { name: 'Bath', slug: 'bath-and-north-east-somerset' },
+                { name: 'Exeter', slug: 'exeter-city' },
+              ].map((area) => (
+                <a
+                  key={area.slug}
+                  href={`/ratings/${area.slug}`}
+                  className="px-4 py-2 rounded-lg border border-white/10 bg-white/[0.02] text-sm text-white/60 hover:text-white hover:border-brand-sky/30 hover:bg-brand-sky/5 transition-all"
+                >
+                  {area.name}
+                </a>
+              ))}
+            </div>
+          </ScrollReveal>
+        </section>
+
         {/* ── Email capture ── */}
         <section className="max-w-xl mx-auto px-4 sm:px-6 py-16">
           <ScrollReveal>

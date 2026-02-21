@@ -25,6 +25,7 @@ export default function Footer() {
               <Link href="/#how-it-works" className="hover:text-white/70 transition-colors">How It Works</Link>
               <Link href="/faq" className="hover:text-white/70 transition-colors">FAQ</Link>
               <Link href="/blog" className="hover:text-white/70 transition-colors">Blog</Link>
+              <Link href="/#browse-areas" className="hover:text-white/70 transition-colors">Browse by Area</Link>
               <Link href="/partners" className="hover:text-white/70 transition-colors">Partner Programme</Link>
               <a href="https://www.food.gov.uk/safety-hygiene/food-hygiene-rating-scheme" target="_blank" rel="noopener noreferrer" className="hover:text-white/70 transition-colors">FSA FHRS Scheme ↗</a>
             </div>

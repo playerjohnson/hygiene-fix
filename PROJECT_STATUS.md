@@ -1,6 +1,6 @@
 # HygieneFix — Project Status
 
-## Last Updated: 2026-02-20 (Session 4 — White-Collar Audit Phase 1)
+## Last Updated: 2026-02-21 (Session 5 — Env Vars Confirmed)
 
 ## Sprint 1 Progress
 
@@ -40,12 +40,12 @@
 - **Purchase tracking** — Supabase hf_purchases table with create/complete lifecycle
 
 ### 🔜 SPRINT 2 REMAINING
-- [ ] Set Stripe env vars in Vercel (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET)
-- [ ] Set Anthropic env var in Vercel (ANTHROPIC_API_KEY)
-- [ ] Set Resend env var in Vercel (RESEND_API_KEY, FROM_EMAIL)
-- [ ] Configure Stripe webhook endpoint in Stripe Dashboard
-- [ ] End-to-end test: search → check → checkout → webhook → email delivery
-- [ ] Set NEXT_PUBLIC_BASE_URL in Vercel for correct redirect URLs
+- [x] Set Stripe env vars in Vercel (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET) ✅
+- [x] Set Anthropic env var in Vercel (ANTHROPIC_API_KEY) ✅
+- [x] Set Resend env var in Vercel (RESEND_API_KEY, FROM_EMAIL) ✅
+- [x] Set NEXT_PUBLIC_BASE_URL in Vercel for correct redirect URLs ✅
+- [x] Configure Stripe webhook endpoint — signature verification confirmed working ✅
+- [ ] End-to-end test purchase: search → check → checkout → webhook → Claude → PDF → email delivery (use test card 4242...)
 
 ## White-Collar Audit Fixes (Phase 1) ✅ 2026-02-20
 
@@ -71,7 +71,8 @@
 
 ### Audit Fixes Still TODO (Phase 2+)
 - [ ] Register hygienefix.co.uk custom domain
-- [ ] Set 6 Vercel env vars to activate revenue
+- [x] Set 6 Vercel env vars to activate revenue ✅ All 10 env vars confirmed set
+- [ ] End-to-end test purchase with test card
 - [ ] Create sample action plan PDF for preview ("See what you get")
 - [ ] GA4 + GTM with conversion funnel events
 - [ ] UptimeRobot monitoring
@@ -111,17 +112,17 @@
 - `hf_purchases` — Stripe payment tracking for £49 action plans
 - `hf_pipeline_runs` — Daily data pull tracking with stats
 
-## Environment Variables (Vercel)
+## Environment Variables (Vercel) — ALL SET ✅
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL ✅
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key (RLS-restricted) ✅
 - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role (server-side only) ✅
 - `CRON_SECRET` — Pipeline auth token ✅
-- `STRIPE_SECRET_KEY` — Stripe secret key ⏳
-- `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret ⏳
-- `ANTHROPIC_API_KEY` — Claude API key ⏳
-- `RESEND_API_KEY` — Resend email API key ⏳
-- `FROM_EMAIL` — Sender email address ⏳
-- `NEXT_PUBLIC_BASE_URL` — Production URL for Stripe redirects ⏳
+- `STRIPE_SECRET_KEY` — Stripe secret key ✅
+- `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret ✅
+- `ANTHROPIC_API_KEY` — Claude API key ✅
+- `RESEND_API_KEY` — Resend email API key ✅
+- `FROM_EMAIL` — Sender email address ✅
+- `NEXT_PUBLIC_BASE_URL` — Production URL for Stripe redirects ✅
 
 ## URLs
 - Production: https://hygiene-fix.vercel.app
